@@ -32,31 +32,28 @@ class Testclass extends React.Component {
     }
 
     Bisection() {
-        // var total = 10;
-        // var L = this.state.left;
-        // var R = this.state.right;
-        // var Eq = this.state.equation;
-        // var M = (L + R) / 2;
-        // var YR = this.Convert_Eq(Eq, R);
-        // var YM = this.Convert_Eq(Eq, M);
-        // while (total > this.Criterion) {
-        //     M = (L + R) / 2;
-        //     YR = this.Convert_Eq(Eq, R);
-        //     YM = this.Convert_Eq(Eq, M);
-        //     if (YM * YR < 0) {
-        //         total = Math.abs((M - L) / M);
-        //         L = M;
-        //     } else {
-        //         total = Math.abs((M - R) / M);
-        //         R = M;
-        //     }
-        //     console.log(Eq + " " + total);
-        // }
-        // document.getElementById("Answer").innerHTML =
-        //     "Result : " + M.toFixed(6);
-        return (
-            <h1>Bisection</h1>
-        );
+        var total = 10;
+        var L = this.state.left;
+        var R = this.state.right;
+        var Eq = this.state.equation;
+        var M = (L + R) / 2;
+        var YR = this.Convert_Eq(Eq, R);
+        var YM = this.Convert_Eq(Eq, M);
+        while (total > this.Criterion) {
+            M = (L + R) / 2;
+            YR = this.Convert_Eq(Eq, R);
+            YM = this.Convert_Eq(Eq, M);
+            if (YM * YR < 0) {
+                total = Math.abs((M - L) / M);
+                L = M;
+            } else {
+                total = Math.abs((M - R) / M);
+                R = M;
+            }
+            console.log(Eq + " " + total);
+        }
+        document.getElementById("Answer").innerHTML =
+            "Result : " + M.toFixed(6);
     }
 
     // False_Position() {
