@@ -5874,6 +5874,11 @@
   dependencies:
     "tmpl" "1.0.5"
 
+"mathjax@^3.2.0":
+  "integrity" "sha512-PL+rdYRK4Wxif+SQ94zP/L0sv6/oW/1WdQiIx0Jvn9FZaU5W9E6nlIv8liYAXBNPL2Fw/i+o/mZ1212eSzn0Cw=="
+  "resolved" "https://registry.npmjs.org/mathjax/-/mathjax-3.2.0.tgz"
+  "version" "3.2.0"
+
 "mathjs@^10.1.1":
   "integrity" "sha512-4QJP8a0Vy90ajFYESnITSluCrQBZnI+2XQhKJIRdo/6t95oupffS5qA4MTWnLGm5GsEZF179JSMjST7wCdZQkA=="
   "resolved" "https://registry.npmjs.org/mathjs/-/mathjs-10.1.1.tgz"

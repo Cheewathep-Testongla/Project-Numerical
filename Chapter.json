@@ -1,0 +1,38 @@
+{
+  "Bisection": [
+    {
+      "id": 1,
+      "equation": "(43*x)-1"
+    },
+    {
+      "id": 2,
+      "equation": "(2*x)-5"
+    },
+    {
+      "id": 3,
+      "equation": "(43*x)-1"
+    },
+    {
+      "id": 4,
+      "equation": "x-1"
+    }
+  ],
+  "False Position": [
+    {
+      "id": 1,
+      "equation": "(43*x)-1"
+    },
+    {
+      "id": 2,
+      "equation": "(2*x)-5"
+    },
+    {
+      "id": 3,
+      "equation": "(43*x)-1"
+    },
+    {
+      "id": 4,
+      "equation": "x-1"
+    }
+  ]
+}

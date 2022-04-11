@@ -1,35 +1,9 @@
 {
-    "RootsofEquations" :
-    [
-        "GrapicalMethod",
-        "BisectionMethod",
-        "FalsePositionMethod",
-        "OnePointIterationMethod",
-        "NewtonRaphsonMethod"
-    ],
-
-    "SolutionsOfLinearAlgebraicEquations" :
-    [
-        "GrapicalMethod",
-        "BisectionMethod",
-        "FalsePositionMethod",
-        "OnePointIterationMethod",
-        "NewtonRaphsonMethod"
-    ],
-
-    "Chapter": 
-    [
-        {
-        "RootsofEquations" : 
-            [
-                {"name": "Grapical Method", "short": "GrapicalMethod"},
-                {"name": "Bisection Method","short": "BisectionMethod"},
-                {"name": "False-Position Method","short": "FalsePositionMethod"},
-                {"name": "One-Point Iteration Method","short": "OnePointIterationMethod"},
-                {"name": "NewtonRaphsonMethod","short": "NewtonRaphsonMethod"},
-                {"name": "Secant Method","short": "SecantMethod"}
-            ]
-        }
-    ]
+  "Bisection" : [
+    {
+        "id": 1,
+        "equation": "(43*x)-1"
+    }
+  ]
 }
 
