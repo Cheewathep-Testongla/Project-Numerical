@@ -1,6 +1,5 @@
-import { render } from "@testing-library/react";
-import React, { forwardRef } from "react";
-import { Link } from "react-router-dom";
+/* eslint-disable jsx-a11y/heading-has-content */
+import React from "react";
 import "./CSS/Panel.css";
 import * as Math from "mathjs";
 import {
@@ -19,6 +18,11 @@ class Home extends React.Component {
         this.state = {
             // API
             API: [],
+            loading: true,
+            // Graph
+            Array_Answer: [],
+            // Answer
+            Matrix_Answer: [],
             // Chapter 1
             left: 0,
             right: 0,
@@ -27,42 +31,133 @@ class Home extends React.Component {
             equation: "",
             size: 0,
             Chapter: "",
-            Check: false,
+            CheckShowChapter: false,
             Criterion: 0.000001,
-            arr: [],
-            CheckPush: false,
             // Chapter 2
             metA: [],
             metB: [],
             metX: [],
             X: 0,
+            // Chapter 3
         };
     }
-    componentDidMount() {
-        console.log(this.state.Chapter);
-        let text = "http://localhost:3001/"
-        let url = text.concat("Bisection");
-        fetch(url)
-            .then((resp) => resp.json())
-            .then((data) => {
-                let genExample = data.map((chapter, id) => {
-                    return (
-                        <div key={id}>
-                            <h3> {chapter.title}</h3>
-                            <p> Equation: {chapter.equation}</p>
-                        </div>
-                    );
-                });
-                this.setState({ API: genExample });
-            });
-    }
+    tempEQ = [];
+    getAPI = (Chapter) => {
+        let text = "http://localhost:3001/";
+        let url = text.concat(Chapter);
+        // console.log(url);
+        if (this.state.loading === true) {
+            switch (Chapter) {
+                case "Cramer_Rule":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.metrixA,
+                                            chapter.metrixB,
+                                        ]}
+                                    >
+                                        {chapter.id}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+                case "Gauss_Elimination":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.metrixA,
+                                            chapter.metrixB,
+                                        ]}
+                                    >
+                                        {chapter.metrixA}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+                case "Bisection":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.equation,
+                                            chapter.left,
+                                            chapter.right,
+                                        ]}
+                                    >
+                                        {chapter.equation}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+                case "False_Position":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.equation,
+                                            chapter.left,
+                                            chapter.right,
+                                        ]}
+                                    >
+                                        {chapter.equation}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     Create_Graph = () => {
         return (
             <LineChart
                 width={1000}
                 height={600}
-                data={this.state.arr}
+                data={this.state.Array_Answer}
                 margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
             >
                 <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
@@ -76,12 +171,7 @@ class Home extends React.Component {
 
     handleChange = (event) => {
         // Get multiple input to
-        // this.temp_arr = [];
-        // this.setState({
-        //     arr: [],
-        //     CheckPush: false,
-        // });
-        const value = event.target.value;
+        let value = event.target.value;
         this.setState({
             ...this.state,
             [event.target.name]: value,
@@ -95,31 +185,35 @@ class Home extends React.Component {
                 this.Calculation();
                 break;
 
-            case "False Position Method":
+            case "False_Position":
                 this.Calculation();
                 break;
 
-            case "One Point Iteration":
+            case "One_Point_Iteration":
                 this.Calculation();
                 break;
 
-            case "Newton Raphson":
+            case "Newton_Raphson":
                 this.Calculation();
                 break;
 
-            case "Secant Method":
+            case "Secant_Method":
                 this.Calculation();
                 break;
 
-            case "Cramer's Rule":
+            case "Cramer_Rule":
                 this.Calculation();
                 break;
 
-            case "Newton's divided-differences":
+            case "Gauss_Elimination":
                 this.Calculation();
                 break;
 
-            case "Lagrange Interpolcation":
+            case "Newton's_divided-differences":
+                this.Calculation();
+                break;
+
+            case "Lagrange_Interpolcation":
                 this.Calculation();
                 break;
 
@@ -135,113 +229,117 @@ class Home extends React.Component {
     };
 
     CheckChapter = (name) => {
+        this.Answer = 0;
+        this.tempEQ = [];
+        this.temp_arr = [];
         switch (name.target.name) {
             case "Bisection":
-                console.log(this.state.Chapter);
                 this.setState({
                     left: 0,
                     right: 0,
                     equation: "",
-                    Check: true,
+                    CheckShowChapter: true,
                     Chapter: "Bisection",
-                    arr: [],
-                    CheckPush: false,
+                    Array_Answer: [],
+                    API: [],
+                    loading: true,
                 });
                 this.temp_arr = [];
                 break;
 
-            case "False Position Method":
-                console.log(this.state.Chapter);
+            case "False_Position":
                 this.setState({
                     left: 0,
                     right: 0,
                     equation: "",
-                    Check: true,
-                    Chapter: "False Position Method",
-                    arr: [],
-                    CheckPush: false,
+                    CheckShowChapter: true,
+                    Chapter: "False_Position",
+                    Array_Answer: [],
+                    API: [],
+                    loading: true,
                 });
-                this.temp_arr = [];
                 break;
 
-            case "One Point Iteration":
-                console.log("One Point Iteration");
-                this.temp_arr = [];
+            case "One_Point_Iteration":
                 this.setState({
                     X0: 0,
                     equation: "",
-                    Check: true,
-                    Chapter: "One Point Iteration",
-                    arr: [],
-                    CheckPush: false,
+                    CheckShowChapter: true,
+                    Chapter: "One_Point_Iteration",
+                    Array_Answer: [],
+                    loading: true,
                 });
                 break;
 
-            case "Newton Raphson Iteration":
-                console.log("Newton Raphson Iteration");
-                this.temp_arr = [];
+            case "Newton_Raphson_Iteration":
                 this.setState({
                     X0: 0,
                     equation: "",
-                    Check: true,
-                    Chapter: "Newton Raphson Iteration",
-                    arr: [],
-                    CheckPush: false,
+                    CheckShowChapter: true,
+                    Chapter: "Newton_Raphson_Iteration",
+                    Array_Answer: [],
+                    loading: true,
                 });
                 break;
 
-            case "Secant Method":
-                console.log("Secant Method");
-                this.temp_arr = [];
+            case "Secant_Method":
                 this.setState({
                     X0: 0,
                     X1: 0,
                     equation: "",
-                    Check: true,
-                    Chapter: "Secant Method",
-                    arr: [],
-                    CheckPush: false,
+                    CheckShowChapter: true,
+                    Chapter: "Secant_Method",
+                    Array_Answer: [],
+                    loading: true,
                 });
                 break;
 
-            case "Cramer's Rule":
-                // console.log("Cramer's Rule");
-                this.temp_arr = [];
+            case "Cramer_Rule":
                 this.setState({
-                    Chapter: "Cramer's Rule",
+                    Chapter: "Cramer_Rule",
                     metA: [],
-                    // metX: [],
                     metB: [],
-                    CheckPush: false,
-                    Check: true,
+                    X: [],
+                    API: [],
+                    CheckShowChapter: true,
+                    loading: true,
+                    Matrix_Answer: [],
                 });
                 break;
 
-            case "Newton's divided-differences":
-                // console.log("Newton's divided-differences");
-                this.temp_arr = [];
+            case "Gauss_Elimination":
                 this.setState({
-                    Chapter: "Newton's divided-differences",
+                    Chapter: "Gauss_Elimination",
                     metA: [],
-                    metX: [],
                     metB: [],
-                    X: 0,
-                    CheckPush: false,
-                    Check: true,
+                    API: [],
+                    CheckShowChapter: true,
+                    loading: true,
+                    Matrix_Answer: [],
                 });
                 break;
 
-            case "Lagrange Interpolcation":
-                // console.log("Lagrange Interpolcation");
-                this.temp_arr = [];
+            case "Newton's_divided-differences":
                 this.setState({
-                    Chapter: "Lagrange Interpolcation",
+                    Chapter: "Newton's_divided-differences",
                     metA: [],
                     metX: [],
                     metB: [],
                     X: 0,
-                    CheckPush: false,
-                    Check: true,
+                    CheckShowChapter: true,
+                    loading: true,
+                });
+                break;
+
+            case "Lagrange_Interpolcation":
+                this.setState({
+                    Chapter: "Lagrange_Interpolcation",
+                    metA: [],
+                    metX: [],
+                    metB: [],
+                    X: 0,
+                    CheckShowChapter: true,
+                    loading: true,
                 });
                 break;
 
@@ -259,6 +357,8 @@ class Home extends React.Component {
     count = 0;
     temp_count = 0;
     temp = 1;
+    Answer = 0;
+
     Recursive = (index1, index2) => {
         var X = JSON.parse(this.state.metX);
         var B = JSON.parse(this.state.metB);
@@ -324,6 +424,17 @@ class Home extends React.Component {
         }
     };
 
+    ReplaceMatrix = (tempA, matA, index, tempB, matB) => {
+        for (let i = 0; i < tempA.length; i++) {
+            matA[index][i] = tempA[i];
+            matB[i] = tempB[i]
+        }
+        this.setState({
+            matA: matA,
+            matB: matB,
+        });
+    };
+
     Calculation = () => {
         var total = 10;
         var L = parseFloat(this.state.left);
@@ -334,78 +445,60 @@ class Home extends React.Component {
         var Xnew = 0;
         switch (this.state.Chapter) {
             case "Bisection":
-                this.temp_arr = [];
-
-                var M = (L + R) / 2;
+                this.Answer = (L + R) / 2;
                 YR = this.Convert_Eq(this.state.equation, R);
-                YM = this.Convert_Eq(this.state.equation, M);
+                YM = this.Convert_Eq(this.state.equation, this.Answer);
 
                 while (total > this.state.Criterion) {
-                    M = (L + R) / 2;
-                    console.log(M);
+                    this.Answer = (L + R) / 2;
                     this.temp_arr.push({
-                        result: M,
+                        result: this.Answer,
                     });
                     YR = this.Convert_Eq(this.state.equation, R);
-                    YM = this.Convert_Eq(this.state.equation, M);
+                    YM = this.Convert_Eq(this.state.equation, this.Answer);
                     if (YM * YR < 0) {
-                        total = this.Cal_Error(M, L);
-                        L = M;
+                        total = this.Cal_Error(this.Answer, L);
+                        L = this.Answer;
                     } else {
-                        total = this.Cal_Error(M, R);
-                        R = M;
+                        total = this.Cal_Error(this.Answer, R);
+                        R = this.Answer;
                     }
                 }
-                this.Answer = M;
+                this.setState({
+                    Array_Answer: this.temp_arr,
+                });
 
-                document.getElementById("Bisection Answer").innerHTML =
-                    "Result : " + this.Answer;
-
-                if (this.state.CheckPush === false) {
-                    this.setState({
-                        CheckPush: true,
-                        arr: this.temp_arr,
-                    });
-                }
                 break;
 
-            case "False Position Method":
-                this.temp_arr = [];
-                console.log("FPM");
-
+            case "False_Position":
                 while (total > this.state.Criterion) {
-                    X =
+                    this.Answer =
                         (L * this.Convert_Eq(this.state.equation, R) -
                             R * this.Convert_Eq(this.state.equation, L)) /
                         (this.Convert_Eq(this.state.equation, R) -
                             this.Convert_Eq(this.state.equation, L));
                     YR = this.Convert_Eq(this.state.equation, R);
-                    var YX = this.Convert_Eq(this.state.equation, X);
+                    var YX = this.Convert_Eq(this.state.equation, this.Answer);
 
                     if (YX * YR < 0) {
-                        total = this.Cal_Error(L, X);
-                        L = X;
+                        total = this.Cal_Error(L, this.Answer);
+                        L = this.Answer;
                     } else {
-                        total = this.Cal_Error(R, X);
-                        R = X;
+                        total = this.Cal_Error(R, this.Answer);
+                        R = this.Answer;
                     }
                     this.temp_arr.push({
-                        result: X.toFixed(6),
+                        result: this.Answer,
                     });
-                    this.Answer = X;
                 }
-                document.getElementById("False Position Answer").innerHTML =
-                    "Result : " + this.Answer.toFixed(6);
 
-                if (this.state.CheckPush === false) {
-                    this.setState({
-                        CheckPush: true,
-                        arr: this.temp_arr,
-                    });
-                }
+                this.setState({
+                    Array_Answer: this.temp_arr,
+                });
+
                 break;
 
-            case "One Point Iteration":
+            case "One_Point_Iteration":
                 this.temp_arr = [];
 
                 var Xold = this.state.X0;
@@ -433,7 +526,7 @@ class Home extends React.Component {
 
                 break;
 
-            // case "Newton Raphson Iteration":
+            // case "Newton_Raphson_Iteration":
             //     X = this.state.X0;
             //     while (total > this.state.Criterion) {
             //         let deltaX = -((7 - Math.pow(X, 2)) / (-2 * X));
@@ -450,13 +543,13 @@ class Home extends React.Component {
             //     }
             //     break;
 
-            case "Secant Method":
+            case "Secant_Method":
                 this.temp_arr = [];
 
                 var X0 = parseFloat(this.state.X0);
                 var X1 = parseFloat(this.state.X1);
                 var Distance = X1 - X0;
-
+                console.log(X0);
                 while (total > this.state.Criterion) {
                     var XKnew =
                         X0 -
@@ -475,15 +568,13 @@ class Home extends React.Component {
                 document.getElementById("Secant Method Answer").innerHTML =
                     "Result : " + XKnew.toFixed(6);
 
-                if (this.state.CheckPush === false) {
-                    this.setState({
-                        CheckPush: true,
-                        arr: this.temp_arr,
-                    });
-                }
+                this.setState({
+                    Array_Answer: this.temp_arr,
+                });
+
                 break;
 
-            case "Cramer's Rule":
+            case "Cramer_Rule":
                 // let X = JSON.parse(JSON.stringify(this.state.metA));
                 // var Xnew = JSON.parse(JSON.stringify(this.state.metA));
                 // var AnsMet = JSON.parse(JSON.stringify(this.state.metB));
@@ -491,7 +582,8 @@ class Home extends React.Component {
                 var Xnew = JSON.parse(this.state.metA);
                 var AnsMet = JSON.parse(this.state.metB);
                 var count = 0;
-                var Answer = [];
+                var Temp = [];
+                var TempAnswer = 0;
                 // console.log(X);
                 while (count < AnsMet.length) {
                     Xnew = JSON.parse(this.state.metA);
@@ -499,20 +591,116 @@ class Home extends React.Component {
                     for (let i = 0; i < X.length; i++) {
                         Xnew[i][count] = AnsMet[i];
                     }
-                    Answer.push((Math.det(Xnew) / Math.det(X)).toFixed(0));
+                    TempAnswer = (Math.det(Xnew) / Math.det(X)).toFixed(0);
+                    Temp.push(
+                        <p id={TempAnswer} value={TempAnswer}>
+                            X{count} : {TempAnswer}
+                        </p>
+                    );
+                    // Answer.push((Math.det(Xnew) / Math.det(X)).toFixed(0));
                     count++;
                 }
-                console.log(Answer);
+                this.setState({
+                    Matrix_Answer: Temp,
+                });
                 break;
 
-            case "Newton's divided-differences":
+            case "Gauss_Elimination":
+                var A = JSON.parse(this.state.metA);
+                var B = JSON.parse(this.state.metB);
+
+                var A_Before = [];
+                var A_Now = [];
+                var B_Before = [];
+                var B_Now = [];
+
+                var TempA = [];
+                var TempB = [];
+
+                var size = A.length;
+
+                for (let i = 0; i < size; i++) 
+                {
+                    if (i === 1) 
+                    {
+                        for (let j = 0; j < size; j++) 
+                        {
+                            A = JSON.parse(this.state.metA);
+                            B = JSON.parse(this.state.metB);
+                            A_Before.push(A[i - 1][j] * A[i][i - 1]);
+                            B_Before.push(B[i - 1] * A[i][i - 1]);
+
+                            A = JSON.parse(this.state.metA);
+                            B = JSON.parse(this.state.metB);
+                            A_Now.push(A[i][j] * A[i - 1][i - 1]);
+                            B_Now.push(B[i] * A[i - 1][i - 1]);
+
+                            console.log(B_Before, B_Now);
+
+                            TempA.push(A_Now[j] - A_Before[j]);
+                            TempB.push(B_Now[j] - B_Before[j]);
+
+                            if (j === size - 1) 
+                            {
+                                this.ReplaceMatrix(TempA, A, i, TempB, B);
+                            }
+                        }
+                        console.log(B);
+                    }
+                    if (i > 1) 
+                    {
+                        var index = 0;
+                        for (let k = 0; k < i; k++) 
+                        {
+                            var n = 0;
+                            A_Before = [];
+                            A_Now = [];
+                            TempA = [];
+                            TempB = [];
+                            for (let l = 0; l < size; l++) 
+                            {
+                                A_Before.push(A[index][l] * A[i][index]);
+                                // B_Before = B[i - 1] * A[i][i - 1];
+
+                                A_Now.push(A[i][l] * A[index][index]);
+                                // B_Now = B[i] * A[i - 1][i];
+
+                                TempA.push(A_Now[n] - A_Before[n]);
+                                // TempB.push(B_Now - B_Before);
+
+                                if (l === size - 1) 
+                                {
+                                    this.ReplaceMatrix(TempA, A, i, TempB, B);
+                                }
+                                n++;
+                            }
+                            index++;
+                        }
+                    }
+                }
+                // console.log(A);
+                var tempAns = 0;
+                var ANS = 0;
+                for (let i = size - 1; i >= 0; i--) {
+                    tempAns = B[i];
+                    ANS = 0;
+                    for (let j = size - 1; j >= 0; j--) {
+                        ANS += A[i][j];
+                    }
+                    break;
+                    tempAns /= ANS;
+                }
+                console.log(B);
+                break;
+
+            case "Newton's_divided-differences":
                 var X = JSON.parse(this.state.metX);
 
                 // this.Recursive(X.length - 1, X.length - 2);
                 // console.log(this.Recursive(X.length - 1, X.length - 2));
                 break;
 
-            case "Lagrange Interpolcation":
+            case "Lagrange_Interpolcation":
                 var ANSWER = 0;
                 var A = JSON.parse(this.state.metA);
                 var B = JSON.parse(this.state.metB);
@@ -527,17 +715,55 @@ class Home extends React.Component {
                         if (i !== j) {
                             Upper *= A[Scope[j] - 1] - X;
                             Lower *= A[Scope[j] - 1] - A[Scope[i] - 1];
-                            // console.log(A[Scope[j]-1]);
-                            // console.log(Upper, Lower);
                         }
                     }
                     ANSWER += (Upper / Lower) * B[Scope[i] - 1];
-                    // console.log(Upper/Lower, B[Scope[i]-1]);
                 }
                 console.log(ANSWER);
                 break;
+
             default:
                 console.log("Null");
+        }
+    };
+
+    getEquationFromAPI = (event) => {
+        var splitValue = "";
+        switch (this.state.Chapter) {
+            case "Cramer_Rule":
+                splitValue = event.target.value.split("|");
+                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                this.setState({
+                    metA: splitValue[0],
+                    metB: splitValue[1],
+                });
+                break;
+            case "Gauss_Elimination":
+                splitValue = event.target.value.split("|");
+                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                this.setState({
+                    metA: splitValue[0],
+                    metB: splitValue[1],
+                });
+                break;
+            case "Bisection":
+                splitValue = event.target.value.split(",");
+                this.setState({
+                    equation: splitValue[0],
+                    left: splitValue[1],
+                    right: splitValue[2],
+                });
+                break;
+            case "False_Position":
+                splitValue = event.target.value.split(",");
+                this.setState({
+                    equation: splitValue[0],
+                    left: splitValue[1],
+                    right: splitValue[2],
+                });
+                break;
+            default:
+                break;
         }
     };
 
@@ -547,9 +773,18 @@ class Home extends React.Component {
                 return (
                     <div>
                         <h1>Bisection Method</h1>
-                        <div className="Test API">
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[
+                                this.state.equation,
+                                this.state.left,
+                                this.state.right,
+                            ]}
+                        >
+                            <option value="">Choose Example Equation</option>
                             {this.state.API}
-                        </div>
+                        </select>
                         <form onSubmit={this.handleSubmit}>
                             <label>
                                 Equation:
@@ -557,13 +792,15 @@ class Home extends React.Component {
                                     id="EQ_Bisection"
                                     type="text"
                                     name="equation"
+                                    value={this.state.equation}
                                     onChange={this.handleChange}
-                                />
+                                ></input>
                                 L:
                                 <input
                                     id="L_Bisection"
                                     type="text"
                                     name="left"
+                                    value={this.state.left}
                                     onChange={this.handleChange}
                                 />
                                 R:
@@ -571,25 +808,38 @@ class Home extends React.Component {
                                     id="R_Bisection"
                                     type="text"
                                     name="right"
+                                    value={this.state.right}
                                     onChange={this.handleChange}
                                 />
                                 {(this.temp_arr = [])}
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
-                                {this.state.equation}, {this.state.left},{" "}
+                                {this.state.equation} {this.state.left}
                                 {this.state.right}
                             </h1>
-                            <h1 id="Bisection Answer" />
+                            Answer : {this.Answer}
                             <div>{this.Create_Graph()}</div>
                         </form>
                     </div>
                 );
 
-            case "False Position Method":
+            case "False_Position":
                 return (
                     <div>
                         <h1>False Position Method</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[
+                                this.state.equation,
+                                this.state.left,
+                                this.state.right,
+                            ]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
                         <form onSubmit={this.handleSubmit}>
                             <label>
                                 Equation:{""}
@@ -597,6 +847,7 @@ class Home extends React.Component {
                                     id="EQ_False_Position"
                                     type="text"
                                     name="equation"
+                                    value={this.state.equation}
                                     onChange={this.handleChange}
                                 />
                                 L:{}
@@ -604,6 +855,7 @@ class Home extends React.Component {
                                     id="L_False_Position"
                                     type="text"
                                     name="left"
+                                    value={this.state.left}
                                     onChange={this.handleChange}
                                 />
                                 R:{}
@@ -611,25 +863,37 @@ class Home extends React.Component {
                                     id="R_False_Position"
                                     type="text"
                                     name="right"
+                                    value={this.state.right}
                                     onChange={this.handleChange}
                                 />
-                                {(this.temp_arr = [])}
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
-                                {this.state.equation}, {this.state.left},
+                                {this.state.equation} {this.state.left}{" "}
                                 {this.state.right}
                             </h1>
-                            <h1 id="False Position Answer" />{" "}
+                            Answer : {this.Answer}
                             <div>{this.Create_Graph()}</div>
                         </form>
                     </div>
                 );
 
-            case "One Point Iteration":
+            case "One_Point_Iteration":
                 return (
                     <div>
                         <h1>One Point Iteration</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[
+                                this.state.equation,
+                                this.state.left,
+                                this.state.right,
+                            ]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
                         <form onSubmit={this.handleSubmit}>
                             <label>
                                 Equation:{""}
@@ -658,11 +922,23 @@ class Home extends React.Component {
                     </div>
                 );
 
-            case "Secant Method":
+            case "Secant_Method":
                 console.log(this.state.Chapter);
                 return (
                     <div>
                         <h1>Secant Method</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[
+                                this.state.equation,
+                                this.state.left,
+                                this.state.right,
+                            ]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
                         <form onSubmit={this.handleSubmit}>
                             <label>
                                 Equation:{""}
@@ -698,48 +974,102 @@ class Home extends React.Component {
                     </div>
                 );
 
-            case "Cramer's Rule":
+            case "Cramer_Rule":
                 return (
                     <div>
                         <h1>Cramer's Rule</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[this.state.metA, this.state.metB]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
                         <form onSubmit={this.handleSubmit}>
                             <label>
-                                metrix A:{""}
+                                metrix A:
                                 <input
                                     id="metA_Cramer"
                                     type="text"
                                     name="metA"
+                                    value={this.state.metA}
                                     onChange={this.handleChange}
                                 />
-                                {/* metrix X:{}
-                                <input
-                                    id="metX_Cramer"
-                                    type="text"
-                                    name="metX"
-                                    onChange={this.handleChange}
-                                /> */}
-                                metrix B:{}
+                                metrix B:
                                 <input
                                     id="metB_Cramer"
                                     type="text"
                                     name="metB"
+                                    value={this.state.metB}
                                     onChange={this.handleChange}
                                 />
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
-                                {this.state.metA}, {this.state.metB}
+                                {this.state.metA} {this.state.metB}
                             </h1>
-                            <h1 id="Cramer's Rule Answer" />{" "}
-                            <div>{this.Create_Graph()}</div>
+                            Answer : {this.state.Matrix_Answer}
                         </form>
                     </div>
                 );
 
-            case "Newton's divided-differences":
+            case "Gauss_Elimination":
+                return (
+                    <div>
+                        <h1>Gauss Elimination Method</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[this.state.metA, this.state.metB]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
+                        <form onSubmit={this.handleSubmit}>
+                            <label>
+                                metrix A:{""}
+                                <input
+                                    id="metA_GaussELi"
+                                    type="text"
+                                    name="metA"
+                                    value={this.state.metA}
+                                    onChange={this.handleChange}
+                                />
+                                metrix B:{}
+                                <input
+                                    id="metB_GaussELi"
+                                    type="text"
+                                    name="metB"
+                                    value={this.state.metB}
+                                    onChange={this.handleChange}
+                                />
+                            </label>
+                            <input type="submit" value="Submit" />
+                            <h1>
+                                {this.state.metA} {this.state.metB}
+                            </h1>
+                            Answer : {this.state.Matrix_Answer}
+                        </form>
+                    </div>
+                );
+
+            case "Newton's_divided-differences":
                 return (
                     <div>
                         <h1>Newton's divided-differences</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[
+                                this.state.equation,
+                                this.state.left,
+                                this.state.right,
+                            ]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
                         <form onSubmit={this.handleSubmit}>
                             <label>
                                 X :{""}
@@ -784,10 +1114,22 @@ class Home extends React.Component {
                     </div>
                 );
 
-            case "Lagrange Interpolcation":
+            case "Lagrange_Interpolcation":
                 return (
                     <div>
                         <h1>Lagrange Interpolcation</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[
+                                this.state.equation,
+                                this.state.left,
+                                this.state.right,
+                            ]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
                         <form onSubmit={this.handleSubmit}>
                             <label>
                                 X :{""}
@@ -852,53 +1194,54 @@ class Home extends React.Component {
                         </button>
 
                         <button
-                            name="False Position Method"
+                            name="False_Position"
                             onClick={this.CheckChapter}
                         >
                             False Position Method
                         </button>
 
                         <button
-                            name="One Point Iteration"
+                            name="One_Point_Iteration"
                             onClick={this.CheckChapter}
                         >
                             One Point Iteration
                         </button>
-
                         <button
-                            name="Secant Method"
+                            name="Secant_Method"
                             onClick={this.CheckChapter}
                         >
                             Secant Method
                         </button>
                         <br></br>
+                        <button name="Cramer_Rule" onClick={this.CheckChapter}>
+                            Cramer's Rule
+                        </button>
                         <button
-                            name="Cramer's Rule"
+                            name="Gauss_Elimination"
                             onClick={this.CheckChapter}
                         >
-                            Cramer's Rule
+                            Gauss Elimination
                         </button>
                         <br></br>
                         <button
-                            name="Newton's divided-differences"
+                            name="Newton's_divided-differences"
                             onClick={this.CheckChapter}
                         >
                             Newton's divided-differences
                         </button>
                         <button
-                            name="Lagrange Interpolcation"
+                            name="Lagrange_Interpolcation"
                             onClick={this.CheckChapter}
                         >
                             Lagrange Interpolcation
                         </button>
                     </div>
                     <div className="home">
-                        {this.state.Check && this.Input()}
+                        {this.state.CheckShowChapter && this.Input()}
                     </div>
                 </div>
             </>
         );
-
     };
 }
 export default Home;
