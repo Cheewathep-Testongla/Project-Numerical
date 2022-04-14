@@ -10,7 +10,8 @@ import {
     YAxis,
     Tooltip,
 } from "recharts";
-import { cos } from "mathjs";
+
+import { MathJax, MathJaxContext } from "better-react-mathjax";
 
 class Home extends React.Component {
     constructor(props) {
@@ -22,12 +23,14 @@ class Home extends React.Component {
             // Graph
             Array_Answer: [],
             // Answer
+            Count_loop: 0,
             Matrix_Answer: [],
             // Chapter 1
             left: 0,
             right: 0,
             X0: 0,
             X1: 0,
+            X: 0,
             equation: "",
             size: 0,
             Chapter: "",
@@ -37,65 +40,38 @@ class Home extends React.Component {
             metA: [],
             metB: [],
             metX: [],
-            X: 0,
+            DisplayMatrixA: [],
+            DisplayMatrixB: [],
             // Chapter 3
         };
     }
+
     tempEQ = [];
+
+    Convert_Latex = (eq) => {
+        try {
+            return (
+                <MathJax dynamic inline>
+                    {"\\(" +
+                        Math.parse(eq.replace(/\*/g, "")).toTex({
+                            parenthesis: "keep",
+                            implicit: "show",
+                        }) +
+                        "\\)"}
+                </MathJax>
+            );
+        } catch (e) {
+            return <MathJax dynamic>{e.toString}</MathJax>;
+        }
+        // console.log("("+Math.parse(eq.replace(/\r/g, "")).toTex({parenthesis: "keep", implicit: "show",}) +")");
+    };
+
     getAPI = (Chapter) => {
         let text = "http://localhost:3001/";
         let url = text.concat(Chapter);
         // console.log(url);
         if (this.state.loading === true) {
             switch (Chapter) {
-                case "Cramer_Rule":
-                    fetch(url)
-                        .then((resp) => resp.json())
-                        .then((data) => {
-                            // eslint-disable-next-line array-callback-return
-                            data.map((chapter) => {
-                                this.tempEQ.push(
-                                    <option
-                                        key={chapter.id}
-                                        value={[
-                                            chapter.metrixA,
-                                            chapter.metrixB,
-                                        ]}
-                                    >
-                                        {chapter.id}
-                                    </option>
-                                );
-                            });
-                            this.setState({ API: this.tempEQ });
-                        });
-                    this.setState({
-                        loading: false,
-                    });
-                    break;
-                case "Gauss_Elimination":
-                    fetch(url)
-                        .then((resp) => resp.json())
-                        .then((data) => {
-                            // eslint-disable-next-line array-callback-return
-                            data.map((chapter) => {
-                                this.tempEQ.push(
-                                    <option
-                                        key={chapter.id}
-                                        value={[
-                                            chapter.metrixA,
-                                            chapter.metrixB,
-                                        ]}
-                                    >
-                                        {chapter.metrixA}
-                                    </option>
-                                );
-                            });
-                            this.setState({ API: this.tempEQ });
-                        });
-                    this.setState({
-                        loading: false,
-                    });
-                    break;
                 case "Bisection":
                     fetch(url)
                         .then((resp) => resp.json())
@@ -121,6 +97,7 @@ class Home extends React.Component {
                         loading: false,
                     });
                     break;
+
                 case "False_Position":
                     fetch(url)
                         .then((resp) => resp.json())
@@ -146,6 +123,252 @@ class Home extends React.Component {
                         loading: false,
                     });
                     break;
+
+                case "One_Point_Iteration":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[chapter.equation, chapter.X0]}
+                                    >
+                                        {chapter.equation}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+
+                case "Newton_Raphson":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[chapter.equation, chapter.X0]}
+                                    >
+                                        {chapter.equation}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+
+                case "Secant_Method":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.equation,
+                                            chapter.X0,
+                                            chapter.X1,
+                                        ]}
+                                    >
+                                        {chapter.equation}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+
+                case "Cramer_Rule":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.metrixA,
+                                            chapter.metrixB,
+                                        ]}
+                                    >
+                                        {chapter.id}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+
+                case "Gauss_Elimination":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.metrixA,
+                                            chapter.metrixB,
+                                        ]}
+                                    >
+                                        {chapter.metrixA}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+
+                case "Gauss_Jordan":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.metrixA,
+                                            chapter.metrixB,
+                                        ]}
+                                    >
+                                        {chapter.metrixA}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+
+                case "LU_Decompost":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.metrixA,
+                                            chapter.metrixB,
+                                        ]}
+                                    >
+                                        {chapter.metrixA}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+
+                case "Jacobi_Iteration":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.metrixA,
+                                            chapter.metrixB,
+                                        ]}
+                                    >
+                                        {chapter.metrixA}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+
+                case "Gauss_Seidel_Iteration":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.metrixA,
+                                            chapter.metrixB,
+                                        ]}
+                                    >
+                                        {chapter.metrixA}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+
+                case "Conjugate_Gradient":
+                    fetch(url)
+                        .then((resp) => resp.json())
+                        .then((data) => {
+                            // eslint-disable-next-line array-callback-return
+                            data.map((chapter) => {
+                                this.tempEQ.push(
+                                    <option
+                                        key={chapter.id}
+                                        value={[
+                                            chapter.metrixA,
+                                            chapter.metrixB,
+                                        ]}
+                                    >
+                                        {chapter.metrixA}
+                                    </option>
+                                );
+                            });
+                            this.setState({ API: this.tempEQ });
+                        });
+                    this.setState({
+                        loading: false,
+                    });
+                    break;
+
                 default:
                     break;
             }
@@ -209,6 +432,26 @@ class Home extends React.Component {
                 this.Calculation();
                 break;
 
+            case "Gauss_Jordan":
+                this.Calculation();
+                break;
+
+            case "LU_Decompost":
+                this.Calculation();
+                break;
+
+            case "Jacobi_Iteration":
+                this.Calculation();
+                break;
+
+            case "Gauss_Seidel_Iteration":
+                this.Calculation();
+                break;
+
+            case "Conjugate_Gradient":
+                this.Calculation();
+                break;
+
             case "Newton's_divided-differences":
                 this.Calculation();
                 break;
@@ -224,8 +467,7 @@ class Home extends React.Component {
     };
 
     Convert_Eq = (Eq, Var) => {
-        Eq = Eq.replace("x", Var);
-        return Math.evaluate(Eq);
+        return Math.evaluate(Eq, { x: Var });
     };
 
     CheckChapter = (name) => {
@@ -267,17 +509,20 @@ class Home extends React.Component {
                     CheckShowChapter: true,
                     Chapter: "One_Point_Iteration",
                     Array_Answer: [],
+                    API: [],
+                    Count_loop: 0,
                     loading: true,
                 });
                 break;
 
-            case "Newton_Raphson_Iteration":
+            case "Newton_Raphson":
                 this.setState({
                     X0: 0,
                     equation: "",
                     CheckShowChapter: true,
-                    Chapter: "Newton_Raphson_Iteration",
+                    Chapter: "Newton_Raphson",
                     Array_Answer: [],
+                    API: [],
                     loading: true,
                 });
                 break;
@@ -316,6 +561,78 @@ class Home extends React.Component {
                     CheckShowChapter: true,
                     loading: true,
                     Matrix_Answer: [],
+                    DisplayMatrixA: [],
+                    DisplayMatrixB: [],
+                });
+                break;
+
+            case "Gauss_Jordan":
+                this.setState({
+                    Chapter: "Gauss_Jordan",
+                    metA: [],
+                    metB: [],
+                    API: [],
+                    CheckShowChapter: true,
+                    loading: true,
+                    Matrix_Answer: [],
+                    DisplayMatrixA: [],
+                    DisplayMatrixB: [],
+                });
+                break;
+
+            case "LU_Decompost":
+                this.setState({
+                    Chapter: "LU_Decompost",
+                    metA: [],
+                    metB: [],
+                    API: [],
+                    CheckShowChapter: true,
+                    loading: true,
+                    Matrix_Answer: [],
+                    DisplayMatrixA: [],
+                    DisplayMatrixB: [],
+                });
+                break;
+
+            case "Jacobi_Iteration":
+                this.setState({
+                    Chapter: "Jacobi_Iteration",
+                    metA: [],
+                    metB: [],
+                    API: [],
+                    CheckShowChapter: true,
+                    loading: true,
+                    Matrix_Answer: [],
+                    DisplayMatrixA: [],
+                    DisplayMatrixB: [],
+                });
+                break;
+
+            case "Gauss_Seidel_Iteration":
+                this.setState({
+                    Chapter: "Gauss_Seidel_Iteration",
+                    metA: [],
+                    metB: [],
+                    API: [],
+                    CheckShowChapter: true,
+                    loading: true,
+                    Matrix_Answer: [],
+                    DisplayMatrixA: [],
+                    DisplayMatrixB: [],
+                });
+                break;
+
+            case "Conjugate_Gradient":
+                this.setState({
+                    Chapter: "Conjugate_Gradient",
+                    metA: [],
+                    metB: [],
+                    API: [],
+                    CheckShowChapter: true,
+                    loading: true,
+                    Matrix_Answer: [],
+                    DisplayMatrixA: [],
+                    DisplayMatrixB: [],
                 });
                 break;
 
@@ -427,12 +744,75 @@ class Home extends React.Component {
     ReplaceMatrix = (tempA, matA, index, tempB, matB) => {
         for (let i = 0; i < tempA.length; i++) {
             matA[index][i] = tempA[i];
-            matB[i] = tempB[i]
         }
-        this.setState({
-            matA: matA,
-            matB: matB,
-        });
+        matB[index] = tempB[index];
+        // this.setState({
+        //     metA: matA,
+        //     metB: matB,
+        // });
+    };
+
+    ForwardElimination = (A, B, size) => {
+        var A_Before = [];
+        var A_Now = [];
+        var B_Before = [];
+        var B_Now = [];
+
+        // New row of Matrix A & B after calculation
+        var TempA = [];
+        var TempB = [];
+
+        for (let i = 0; i < size; i++) {
+            if (i === 1) {
+                for (let j = 0; j < size; j++) {
+                    // A = JSON.parse(this.state.metA);
+                    // B = JSON.parse(this.state.metB);
+                    A_Before.push(A[i - 1][j] * A[i][i - 1]);
+                    B_Before.push(B[0] * A[1][0]);
+
+                    // A = JSON.parse(this.state.metA);
+                    // B = JSON.parse(this.state.metB);
+                    A_Now.push(A[i][j] * A[i - 1][i - 1]);
+                    B_Now.push(B[1] * A[0][0]);
+
+                    TempA.push(A_Now[j] - A_Before[j]);
+                    TempB.push(B_Now[j] - B_Before[j]);
+
+                    if (j === size - 1) {
+                        this.ReplaceMatrix(TempA, A, i, TempB, B);
+                    }
+                }
+            }
+            if (i > 1) {
+                var index = 0;
+                for (let k = 0; k < i; k++) {
+                    var n = 0;
+                    A_Before = [];
+                    A_Now = [];
+                    B_Before = [];
+                    B_Now = [];
+                    TempA = [];
+                    TempB = [];
+                    for (let l = 0; l < size; l++) {
+                        A_Before.push(A[index][l] * A[i][index]);
+                        B_Before.push(B[index] * A[i][index]);
+
+                        A_Now.push(A[i][l] * A[index][index]);
+                        B_Now.push(B[i] * A[index][index]);
+
+                        TempA.push(A_Now[n] - A_Before[n]);
+                        TempB.push(B_Now[n] - B_Before[n]);
+
+                        if (l === size - 1) {
+                            this.ReplaceMatrix(TempA, A, i, TempB, B);
+                        }
+                        n++;
+                    }
+                    index++;
+                }
+            }
+        }
+        return [A, B];
     };
 
     Calculation = () => {
@@ -443,6 +823,8 @@ class Home extends React.Component {
         var YM = 0;
         var X = 0;
         var Xnew = 0;
+        var count = 0;
+        var Final_Answer = [];
         switch (this.state.Chapter) {
             case "Bisection":
                 this.Answer = (L + R) / 2;
@@ -501,47 +883,59 @@ class Home extends React.Component {
             case "One_Point_Iteration":
                 this.temp_arr = [];
 
-                var Xold = this.state.X0;
+                var Xold = JSON.parse(this.state.X0);
+
                 Xnew = 0;
+
                 while (total > this.state.Criterion) {
                     Xnew = this.Convert_Eq(this.state.equation, Xold);
                     if (this.Cal_Error(Xold, Xnew) > this.state.Criterion) {
                         total = this.Cal_Error(Xnew, Xold);
+                        console.log(total);
                         Xold = Xnew;
                     } else {
-                        if (this.state.CheckPush === false) {
-                            this.setState({
-                                CheckPush: true,
-                                arr: this.temp_arr,
-                            });
-                        }
-                        return (document.getElementById(
-                            "One Point Iteration Answer"
-                        ).innerHTML = "Result : " + Xold.toFixed(6));
+                        this.setState({
+                            CheckPush: true,
+                            Array_Answer: this.temp_arr,
+                        });
+                        this.Answer = Xold;
+                        break;
                     }
                     this.temp_arr.push({
                         result: Xold,
                     });
+                    // Count_loop++;
                 }
 
                 break;
 
-            // case "Newton_Raphson_Iteration":
-            //     X = this.state.X0;
-            //     while (total > this.state.Criterion) {
-            //         let deltaX = -((7 - Math.pow(X, 2)) / (-2 * X));
-            //         let Xnew = X + deltaX;
+            case "Newton_Raphson":
+                Xold = JSON.parse(this.state.X0);
 
-            //         if (this.Cal_Error(Xnew, Xold) > this.state.Criterion) {
-            //             total = this.Cal_Error(Xnew, Xold);
-            //             X = Xnew;
-            //         } else {
-            //             console.log(Xnew + " " + this.Cal_Error(Xnew, Xold));
-            //             return Xnew.toFixed(6);
-            //         }
-            //         console.log(Xnew.toFixed(6));
-            //     }
-            //     break;
+                while (total > this.state.Criterion) {
+                    let deltaX =
+                        -1 *
+                        (this.Convert_Eq(this.state.equation, Xold) /
+                            Math.derivative(this.state.equation, "x").evaluate({
+                                x: Xold,
+                            }));
+
+                    let Xnew = Xold + deltaX;
+                    Final_Answer.push({
+                        result: Xnew,
+                    });
+                    if (this.Cal_Error(Xnew, Xold) > this.state.Criterion) {
+                        total = this.Cal_Error(Xnew, Xold);
+                        Xold = Xnew;
+                    } else {
+                        break;
+                    }
+                    this.Answer = Xnew;
+                }
+                this.setState({
+                    Array_Answer: Final_Answer,
+                });
+                break;
 
             case "Secant_Method":
                 this.temp_arr = [];
@@ -549,7 +943,7 @@ class Home extends React.Component {
                 var X0 = parseFloat(this.state.X0);
                 var X1 = parseFloat(this.state.X1);
                 var Distance = X1 - X0;
-                console.log(X0);
+
                 while (total > this.state.Criterion) {
                     var XKnew =
                         X0 -
@@ -557,34 +951,26 @@ class Home extends React.Component {
                             (this.Convert_Eq(this.state.equation, X0) -
                                 this.Convert_Eq(this.state.equation, X1));
                     total = this.Cal_Error(X0, XKnew);
-                    this.temp_arr.push({
+                    Final_Answer.push({
                         result: XKnew,
                     });
-                    console.log(this.temp_arr);
                     X0 = XKnew;
                     X1 = XKnew + Distance;
                 }
-
-                document.getElementById("Secant Method Answer").innerHTML =
-                    "Result : " + XKnew.toFixed(6);
+                console.log(total);
+                this.Answer = XKnew;
 
                 this.setState({
-                    Array_Answer: this.temp_arr,
+                    Array_Answer: Final_Answer,
                 });
 
                 break;
 
             case "Cramer_Rule":
-                // let X = JSON.parse(JSON.stringify(this.state.metA));
-                // var Xnew = JSON.parse(JSON.stringify(this.state.metA));
-                // var AnsMet = JSON.parse(JSON.stringify(this.state.metB));
                 X = JSON.parse(this.state.metA);
-                var Xnew = JSON.parse(this.state.metA);
+                Xnew = JSON.parse(this.state.metA);
                 var AnsMet = JSON.parse(this.state.metB);
-                var count = 0;
-                var Temp = [];
                 var TempAnswer = 0;
-                // console.log(X);
                 while (count < AnsMet.length) {
                     Xnew = JSON.parse(this.state.metA);
                     AnsMet = JSON.parse(this.state.metB);
@@ -592,105 +978,255 @@ class Home extends React.Component {
                         Xnew[i][count] = AnsMet[i];
                     }
                     TempAnswer = (Math.det(Xnew) / Math.det(X)).toFixed(0);
-                    Temp.push(
+                    Final_Answer.push(
                         <p id={TempAnswer} value={TempAnswer}>
                             X{count} : {TempAnswer}
                         </p>
                     );
-                    // Answer.push((Math.det(Xnew) / Math.det(X)).toFixed(0));
                     count++;
                 }
                 this.setState({
-                    Matrix_Answer: Temp,
+                    Matrix_Answer: Final_Answer,
                 });
                 break;
 
             case "Gauss_Elimination":
+                // Initial Matrix A & B
                 var A = JSON.parse(this.state.metA);
                 var B = JSON.parse(this.state.metB);
 
-                var A_Before = [];
-                var A_Now = [];
-                var B_Before = [];
-                var B_Now = [];
-
-                var TempA = [];
-                var TempB = [];
-
+                //Initial length of For
                 var size = A.length;
 
-                for (let i = 0; i < size; i++) 
-                {
-                    if (i === 1) 
-                    {
-                        for (let j = 0; j < size; j++) 
-                        {
-                            A = JSON.parse(this.state.metA);
-                            B = JSON.parse(this.state.metB);
-                            A_Before.push(A[i - 1][j] * A[i][i - 1]);
-                            B_Before.push(B[i - 1] * A[i][i - 1]);
+                // Called function Forward Elimination
+                [A, B] = this.ForwardElimination(A, B, size);
+                // get divisor for each round when finding X
+                var round = 0;
 
-                            A = JSON.parse(this.state.metA);
-                            B = JSON.parse(this.state.metB);
-                            A_Now.push(A[i][j] * A[i - 1][i - 1]);
-                            B_Now.push(B[i] * A[i - 1][i - 1]);
+                // set multiplier 1 & 2 to used when finding X
+                var multiplier_1 = 0;
+                var multiplier_2 = 0;
 
-                            console.log(B_Before, B_Now);
+                // Initila Answer (X)
+                Final_Answer = JSON.parse(this.state.metB);
 
-                            TempA.push(A_Now[j] - A_Before[j]);
-                            TempB.push(B_Now[j] - B_Before[j]);
+                // Array which used to push HTML then setstate to Matrix_Answer
+                var Answer_Gauss_Elimination = [];
 
-                            if (j === size - 1) 
-                            {
-                                this.ReplaceMatrix(TempA, A, i, TempB, B);
-                            }
-                        }
-                        console.log(B);
-                    }
-                    if (i > 1) 
-                    {
-                        var index = 0;
-                        for (let k = 0; k < i; k++) 
-                        {
-                            var n = 0;
-                            A_Before = [];
-                            A_Now = [];
-                            TempA = [];
-                            TempB = [];
-                            for (let l = 0; l < size; l++) 
-                            {
-                                A_Before.push(A[index][l] * A[i][index]);
-                                // B_Before = B[i - 1] * A[i][i - 1];
+                var index = size - 1;
 
-                                A_Now.push(A[i][l] * A[index][index]);
-                                // B_Now = B[i] * A[i - 1][i];
-
-                                TempA.push(A_Now[n] - A_Before[n]);
-                                // TempB.push(B_Now - B_Before);
-
-                                if (l === size - 1) 
-                                {
-                                    this.ReplaceMatrix(TempA, A, i, TempB, B);
-                                }
-                                n++;
-                            }
-                            index++;
-                        }
-                    }
-                }
-                // console.log(A);
-                var tempAns = 0;
-                var ANS = 0;
+                // Backward Substitution
                 for (let i = size - 1; i >= 0; i--) {
-                    tempAns = B[i];
-                    ANS = 0;
-                    for (let j = size - 1; j >= 0; j--) {
-                        ANS += A[i][j];
+                    multiplier_1 = 0;
+                    multiplier_2 = 0;
+                    round = B[i];
+                    for (let j = 0; j < size; j++) {
+                        if (i === j) {
+                            multiplier_1 += A[i][j];
+                        } else {
+                            multiplier_2 += Final_Answer[j] * A[i][j];
+                        }
+                        // console.log(multiplier_1, multiplier_2);
+                        if (j === size - 1) {
+                            round -= multiplier_2;
+                            round /= multiplier_1;
+                            Final_Answer[index] = round;
+
+                            Answer_Gauss_Elimination.push(
+                                <p id={round} value={round}>
+                                    X{index} : {round}
+                                </p>
+                            );
+                        }
                     }
-                    break;
-                    tempAns /= ANS;
+                    index--;
                 }
-                console.log(B);
+
+                this.setState({
+                    Matrix_Answer: Answer_Gauss_Elimination,
+                });
+                break;
+
+            case "Gauss_Jordan":
+                A = JSON.parse(this.state.metA);
+                B = JSON.parse(this.state.metB);
+
+                //Initial length of For
+                size = A.length;
+
+                // Called function Forward Elimination
+                [A, B] = this.ForwardElimination(A, B, size);
+
+                // console.log(A, B);
+                var Final_AnswerA = A;
+                var Final_AnswerB = B;
+
+                // console.log(this.state.D);
+                multiplier_1 = [];
+                multiplier_2 = [];
+
+                var a = A;
+                var b = B;
+                index = size - 1;
+
+                //Further Reduction
+                // for (let i = size - 1; i >= 0; i--) {
+                //     round = B[i];
+                //     var tb = 0;
+                //     for (let j = size - 1; j >= 0; j--) {
+                //         if (i === j) {
+                //             // Final_AnswerA[index][j] = A[i][j] / A[i][j];
+                //             Final_AnswerB[index] = B[j] / A[i][j];
+
+                //             // a[i-1][j] = a[i][j]*a[i-1][j];
+                //             b[index] = b[i]*a[i-1][j];
+                //             tb = b;
+                //         }
+                //         else{
+                //             // Final_AnswerA[index][j] = Final_AnswerA[i][j] - a[i][j];
+                //             Final_AnswerB[i] = Final_AnswerB[index] - tb[j];
+                //             // console.log(Final_AnswerB);
+                //             // console.log(Final_AnswerA);
+                //         }
+
+                //         console.log(Final_AnswerB);
+                //         // console.log(A);
+                //     }
+                //     index--;
+                // }
+                break;
+
+            case "LU_Decompost":
+                break;
+
+            case "Jacobi_Iteration":
+                var A = JSON.parse(this.state.metA);
+                var B = JSON.parse(this.state.metB);
+                var X = JSON.parse(this.state.metB);
+                var Get_Error = JSON.parse(this.state.metB);
+                var Temp_Step_2 = JSON.parse(this.state.metB);
+                size = X.length;
+
+                // Initial X to be 0
+                for(let i = 0; i < size; i++)
+                {
+                    X[i] = 0;
+                    Get_Error[i] = 0;
+                    Temp_Step_2[i] = 0;
+                }
+
+                var Step_1 = 0;
+                var Step_2 = 0;
+                
+                var WhenToBreak = 0;
+                while(true)
+                {
+                    Temp_Step_2 = Array(Temp_Step_2.length).fill(0);
+                    WhenToBreak = 0;
+                    for(let i = 0; i < size; i++)
+                    {
+                        Step_2 = 0;
+                        for(let j = 0; j < size; j++)
+                        {
+                            if(i !== j)
+                            {
+                               Step_1 += A[i][j]*X[j];
+                            }
+                        }
+                        Step_2 = (B[i]-Step_1)/A[i][i];
+                        Temp_Step_2[i] = Step_2;
+
+                        Step_1 = 0;
+
+                        Get_Error[i] = this.Cal_Error(X[i], Step_2);
+                        if(Get_Error[i] > this.state.Criterion)
+                        {
+                            WhenToBreak++;
+                        }
+                    }   
+                    X = Temp_Step_2;
+
+                    if(WhenToBreak === 0)
+                    {
+                        for(let i = 0; i < size; i++)
+                        {
+                            Final_Answer.push(
+                                <h1>X{i} : {X[i]}</h1>
+                            )
+                        }
+                      
+                        this.setState({
+                            Matrix_Answer: Final_Answer,
+                        })
+                        break;
+                    }
+                }
+                break;
+
+            case "Gauss_Seidel_Iteration":
+                var A = JSON.parse(this.state.metA);
+                var B = JSON.parse(this.state.metB);
+                var X = JSON.parse(this.state.metB);
+                var Get_Error = JSON.parse(this.state.metB);
+                var Temp_Step_2 = JSON.parse(this.state.metB);
+                size = X.length;
+
+                // Initial X to be 0
+                for(let i = 0; i < size; i++)
+                {
+                    X[i] = 0;
+                    Get_Error[i] = 0;
+                    Temp_Step_2[i] = 0;
+                }
+
+                var Step_1 = 0;
+                var Step_2 = 0;
+                
+                var WhenToBreak = 0;
+                while(true)
+                {
+                    WhenToBreak = 0;
+                    for(let i = 0; i < size; i++)
+                    {
+                        Step_2 = 0;
+                        for(let j = 0; j < size; j++)
+                        {
+                            if(i !== j)
+                            {
+                               Step_1 += A[i][j]*X[j];
+                            }
+                        }
+                        Step_2 = (B[i]-Step_1)/A[i][i];
+                        Temp_Step_2[i] = Step_2;
+
+                        Step_1 = 0;
+
+                        Get_Error[i] = this.Cal_Error(X[i], Step_2);
+                        X[i] = Step_2
+                        if(Get_Error[i] > this.state.Criterion)
+                        {
+                            WhenToBreak++;
+                        }
+                    }   
+                    console.log(Get_Error)
+                    if(WhenToBreak === 0)
+                    {
+                        for(let i = 0; i < size; i++)
+                        {
+                            Final_Answer.push(
+                                <h1>X{i} : {X[i]}</h1>
+                            )
+                        }
+                      
+                        this.setState({
+                            Matrix_Answer: Final_Answer,
+                        })
+                        break;
+                    }
+                }
+                break;
+
+            case "Conjugate_Gradient":
                 break;
 
             case "Newton's_divided-differences":
@@ -730,22 +1266,6 @@ class Home extends React.Component {
     getEquationFromAPI = (event) => {
         var splitValue = "";
         switch (this.state.Chapter) {
-            case "Cramer_Rule":
-                splitValue = event.target.value.split("|");
-                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
-                this.setState({
-                    metA: splitValue[0],
-                    metB: splitValue[1],
-                });
-                break;
-            case "Gauss_Elimination":
-                splitValue = event.target.value.split("|");
-                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
-                this.setState({
-                    metA: splitValue[0],
-                    metB: splitValue[1],
-                });
-                break;
             case "Bisection":
                 splitValue = event.target.value.split(",");
                 this.setState({
@@ -754,6 +1274,7 @@ class Home extends React.Component {
                     right: splitValue[2],
                 });
                 break;
+
             case "False_Position":
                 splitValue = event.target.value.split(",");
                 this.setState({
@@ -762,6 +1283,109 @@ class Home extends React.Component {
                     right: splitValue[2],
                 });
                 break;
+
+            case "One_Point_Iteration":
+                splitValue = event.target.value.split(",");
+                this.setState({
+                    equation: splitValue[0],
+                    X0: splitValue[1],
+                });
+                break;
+
+            case "Newton_Raphson":
+                splitValue = event.target.value.split(",");
+                this.setState({
+                    equation: splitValue[0],
+                    X0: splitValue[1],
+                });
+                break;
+
+            case "Secant_Method":
+                splitValue = event.target.value.split(",");
+                this.setState({
+                    equation: splitValue[0],
+                    X0: splitValue[1],
+                    X1: splitValue[2],
+                });
+                break;
+
+            case "Cramer_Rule":
+                splitValue = event.target.value.split("|");
+                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                this.setState({
+                    metA: splitValue[0],
+                    metB: splitValue[1],
+                    DisplayMatrixA: splitValue[0],
+                    DisplayMatrixB: splitValue[1],
+                });
+                break;
+
+            case "Gauss_Elimination":
+                splitValue = event.target.value.split("|");
+                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                this.setState({
+                    metA: splitValue[0],
+                    metB: splitValue[1],
+                    DisplayMatrixA: splitValue[0],
+                    DisplayMatrixB: splitValue[1],
+                });
+                break;
+
+            case "Gauss_Jordan":
+                splitValue = event.target.value.split("|");
+                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                this.setState({
+                    metA: splitValue[0],
+                    metB: splitValue[1],
+                    DisplayMatrixA: splitValue[0],
+                    DisplayMatrixB: splitValue[1],
+                });
+                break;
+
+            case "LU_Decompost":
+                splitValue = event.target.value.split("|");
+                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                this.setState({
+                    metA: splitValue[0],
+                    metB: splitValue[1],
+                    DisplayMatrixA: splitValue[0],
+                    DisplayMatrixB: splitValue[1],
+                });
+                break;
+
+            case "Jacobi_Iteration":
+                splitValue = event.target.value.split("|");
+                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                this.setState({
+                    metA: splitValue[0],
+                    metB: splitValue[1],
+                    DisplayMatrixA: splitValue[0],
+                    DisplayMatrixB: splitValue[1],
+                });
+                break;
+
+            case "Gauss_Seidel_Iteration":
+                splitValue = event.target.value.split("|");
+                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                this.setState({
+                    metA: splitValue[0],
+                    metB: splitValue[1],
+                    DisplayMatrixA: splitValue[0],
+                    DisplayMatrixB: splitValue[1],
+                });
+                break;
+
+            case "Conjugate_Gradient":
+                splitValue = event.target.value.split("|");
+                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                this.setState({
+                    metA: splitValue[0],
+                    metB: splitValue[1],
+                    DisplayMatrixA: splitValue[0],
+                    DisplayMatrixB: splitValue[1],
+                });
+                break;
+
             default:
                 break;
         }
@@ -815,8 +1439,22 @@ class Home extends React.Component {
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
-                                {this.state.equation} {this.state.left}
-                                {this.state.right}
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        Your Equation :{" "}
+                                        {this.Convert_Latex(
+                                            this.state.equation
+                                        )}{" "}
+                                        <br></br>
+                                        Left Boudary :{" "}
+                                        {this.Convert_Latex(
+                                            this.state.left
+                                        )}{" "}
+                                        <br></br>
+                                        Right Boundary :{" "}
+                                        {this.Convert_Latex(this.state.right)}
+                                    </MathJax>
+                                </MathJaxContext>
                             </h1>
                             Answer : {this.Answer}
                             <div>{this.Create_Graph()}</div>
@@ -869,8 +1507,22 @@ class Home extends React.Component {
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
-                                {this.state.equation} {this.state.left}{" "}
-                                {this.state.right}
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        Your Equation :{" "}
+                                        {this.Convert_Latex(
+                                            this.state.equation
+                                        )}{" "}
+                                        <br></br>
+                                        Left Boudary :{" "}
+                                        {this.Convert_Latex(
+                                            this.state.left
+                                        )}{" "}
+                                        <br></br>
+                                        Right Boundary :{" "}
+                                        {this.Convert_Latex(this.state.right)}
+                                    </MathJax>
+                                </MathJaxContext>
                             </h1>
                             Answer : {this.Answer}
                             <div>{this.Create_Graph()}</div>
@@ -885,11 +1537,7 @@ class Home extends React.Component {
                         {this.getAPI(this.state.Chapter)}
                         <select
                             onChange={this.getEquationFromAPI}
-                            value={[
-                                this.state.equation,
-                                this.state.left,
-                                this.state.right,
-                            ]}
+                            value={[this.state.equation, this.state.X0]}
                         >
                             <option value="">Choose Example Equation</option>
                             {this.state.API}
@@ -901,29 +1549,91 @@ class Home extends React.Component {
                                     id="EQ_One_Point"
                                     type="text"
                                     name="equation"
+                                    value={this.state.equation}
                                     onChange={this.handleChange}
                                 />
-                                X:{}
+                                X0:{}
                                 <input
                                     id="X_One_Point"
                                     type="text"
                                     name="X0"
+                                    value={this.state.X0}
                                     onChange={this.handleChange}
                                 />
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
                                 {this.state.equation}, {this.state.X0}
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        Your Equation :{" "}
+                                        {this.Convert_Latex(
+                                            this.state.equation
+                                        )}{" "}
+                                        <br></br>
+                                        Inital X :{" "}
+                                        {this.Convert_Latex(this.state.X0)}
+                                    </MathJax>
+                                </MathJaxContext>
                             </h1>
-                            <h1 id="One Point Iteration Answer" />
+                            Answer : {this.Answer}
+                            <div>{this.Create_Graph()}</div>
+                        </form>
+                    </div>
+                );
 
+            case "Newton_Raphson":
+                return (
+                    <div>
+                        <h1>Newton Raphson</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[this.state.equation, this.state.X0]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
+                        <form onSubmit={this.handleSubmit}>
+                            <label>
+                                Equation:{""}
+                                <input
+                                    id="EQ_Newton"
+                                    type="text"
+                                    name="equation"
+                                    value={this.state.equation}
+                                    onChange={this.handleChange}
+                                />
+                                X0:{}
+                                <input
+                                    id="X0_Newton"
+                                    type="text"
+                                    name="X0"
+                                    value={this.state.X0}
+                                    onChange={this.handleChange}
+                                />
+                            </label>
+                            <input type="submit" value="Submit" />
+                            <h1>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        Your Equation :{" "}
+                                        {this.Convert_Latex(
+                                            this.state.equation
+                                        )}{" "}
+                                        <br></br>
+                                        Inital X :{" "}
+                                        {this.Convert_Latex(this.state.X0)}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h1>
+                            Answer : {this.Answer}
                             <div>{this.Create_Graph()}</div>
                         </form>
                     </div>
                 );
 
             case "Secant_Method":
-                console.log(this.state.Chapter);
                 return (
                     <div>
                         <h1>Secant Method</h1>
@@ -932,8 +1642,8 @@ class Home extends React.Component {
                             onChange={this.getEquationFromAPI}
                             value={[
                                 this.state.equation,
-                                this.state.left,
-                                this.state.right,
+                                this.state.X0,
+                                this.state.X1,
                             ]}
                         >
                             <option value="">Choose Example Equation</option>
@@ -946,6 +1656,7 @@ class Home extends React.Component {
                                     id="EQ_Secant"
                                     type="text"
                                     name="equation"
+                                    value={this.state.equation}
                                     onChange={this.handleChange}
                                 />
                                 X0:{}
@@ -953,6 +1664,7 @@ class Home extends React.Component {
                                     id="X0_Secant"
                                     type="text"
                                     name="X0"
+                                    value={this.state.X0}
                                     onChange={this.handleChange}
                                 />
                                 X1:{}
@@ -960,15 +1672,28 @@ class Home extends React.Component {
                                     id="X1_Secant"
                                     type="text"
                                     name="X1"
+                                    value={this.state.X1}
                                     onChange={this.handleChange}
                                 />
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
-                                {this.state.equation}, {this.state.X0},{" "}
-                                {this.state.X1}
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        Your Equation :{" "}
+                                        {this.Convert_Latex(
+                                            this.state.equation
+                                        )}{" "}
+                                        <br></br>
+                                        Inital X0 :{" "}
+                                        {this.Convert_Latex(this.state.X0)}
+                                        <br></br>
+                                        Inital X1 :{" "}
+                                        {this.Convert_Latex(this.state.X1)}
+                                    </MathJax>
+                                </MathJaxContext>
                             </h1>
-                            <h1 id="Secant Method Answer" />{" "}
+                            Answer : {this.Answer}
                             <div>{this.Create_Graph()}</div>
                         </form>
                     </div>
@@ -1007,7 +1732,15 @@ class Home extends React.Component {
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
-                                {this.state.metA} {this.state.metB}
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        MatrixA :{" "}
+                                        {this.Convert_Latex(this.state.metA)}
+                                        <br></br>
+                                        MatrixB :{" "}
+                                        {this.Convert_Latex(this.state.metB)}
+                                    </MathJax>
+                                </MathJaxContext>
                             </h1>
                             Answer : {this.state.Matrix_Answer}
                         </form>
@@ -1047,8 +1780,254 @@ class Home extends React.Component {
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
-                                {this.state.metA} {this.state.metB}
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        MatrixA :{" "}
+                                        {this.Convert_Latex(this.state.metA)}
+                                        <br></br>
+                                        MatrixB :{" "}
+                                        {this.Convert_Latex(this.state.metB)}
+                                    </MathJax>
+                                </MathJaxContext>
                             </h1>
+                            Answer : {this.state.Matrix_Answer}
+                        </form>
+                    </div>
+                );
+
+            case "Gauss_Jordan":
+                return (
+                    <div>
+                        <h1>Gauss Jordan</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[this.state.metA, this.state.metB]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
+                        <form onSubmit={this.handleSubmit}>
+                            <label>
+                                metrix A:{""}
+                                <input
+                                    id="metA_GaussJor"
+                                    type="text"
+                                    name="metA"
+                                    value={this.state.metA}
+                                    onChange={this.handleChange}
+                                />
+                                metrix B:{}
+                                <input
+                                    id="metB_GaussJor"
+                                    type="text"
+                                    name="metB"
+                                    value={this.state.metB}
+                                    onChange={this.handleChange}
+                                />
+                            </label>
+                            <input type="submit" value="Submit" />
+                            <h1>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        MatrixA :{" "}
+                                        {this.Convert_Latex(this.state.metA)}
+                                        <br></br>
+                                        MatrixB :{" "}
+                                        {this.Convert_Latex(this.state.metB)}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h1>
+                            Answer : {this.state.Matrix_Answer}
+                        </form>
+                    </div>
+                );
+
+            case "LU_Decompost":
+                return (
+                    <div>
+                        <h1>LU Decompost</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[this.state.metA, this.state.metB]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
+                        <form onSubmit={this.handleSubmit}>
+                            <label>
+                                metrix A:{""}
+                                <input
+                                    id="metA_LU"
+                                    type="text"
+                                    name="metA"
+                                    value={this.state.metA}
+                                    onChange={this.handleChange}
+                                />
+                                metrix B:{}
+                                <input
+                                    id="metB_LU"
+                                    type="text"
+                                    name="metB"
+                                    value={this.state.metB}
+                                    onChange={this.handleChange}
+                                />
+                            </label>
+                            <input type="submit" value="Submit" />
+                            <h1>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        MatrixA :{" "}
+                                        {this.Convert_Latex(this.state.metA)}
+                                        <br></br>
+                                        MatrixB :{" "}
+                                        {this.Convert_Latex(this.state.metB)}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h1>
+                            Answer : {this.state.Matrix_Answer}
+                        </form>
+                    </div>
+                );
+
+            case "Jacobi_Iteration":
+                return (
+                    <div>
+                        <h1>Jacobi Iteration Method</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[this.state.metA, this.state.metB]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
+                        <form onSubmit={this.handleSubmit}>
+                            <label>
+                                metrix A:
+                                <input
+                                    id="metA_Jacobi"
+                                    type="text"
+                                    name="metA"
+                                    value={this.state.metA}
+                                    onChange={this.handleChange}
+                                />
+                                metrix B:
+                                <input
+                                    id="metB_Jacobi"
+                                    type="text"
+                                    name="metB"
+                                    value={this.state.metB}
+                                    onChange={this.handleChange}
+                                />
+                            </label>
+                            <input type="submit" value="Submit" />
+                            <h1>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        MatrixA :
+                                        {this.Convert_Latex(this.state.metA)}
+                                        <br></br>
+                                        MatrixB :
+                                        {this.Convert_Latex(this.state.metB)}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h1>
+                            Answer : {this.state.Matrix_Answer}
+                        </form>
+                    </div>
+                );
+
+            case "Gauss_Seidel_Iteration":
+                return (
+                    <div>
+                        <h1>Gauss Seidel Iteration Method</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[this.state.metA, this.state.metB]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
+                        <form onSubmit={this.handleSubmit}>
+                            <label>
+                                metrix A:{""}
+                                <input
+                                    id="metA_Gauss_Seidel"
+                                    type="text"
+                                    name="metA"
+                                    value={this.state.metA}
+                                    onChange={this.handleChange}
+                                />
+                                metrix B:{}
+                                <input
+                                    id="metB_Gauss_Seidel"
+                                    type="text"
+                                    name="metB"
+                                    value={this.state.metB}
+                                    onChange={this.handleChange}
+                                />
+                            </label>
+                            <input type="submit" value="Submit" />
+                            <h1>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        MatrixA :{" "}
+                                        {this.Convert_Latex(this.state.metA)}
+                                        <br></br>
+                                        MatrixB :{" "}
+                                        {this.Convert_Latex(this.state.metB)}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h1>
+                            Answer : {this.state.Matrix_Answer}
+                        </form>
+                    </div>
+                );
+
+            case "Conjugate_Gradient":
+                return (
+                    <div>
+                        <h1>Conjugate Gradient Method"</h1>
+                        {this.getAPI(this.state.Chapter)}
+                        <select
+                            onChange={this.getEquationFromAPI}
+                            value={[this.state.metA, this.state.metB]}
+                        >
+                            <option value="">Choose Example Equation</option>
+                            {this.state.API}
+                        </select>
+                        <form onSubmit={this.handleSubmit}>
+                            <label>
+                                metrix A:{""}
+                                <input
+                                    id="metA_Gauss_Seidel"
+                                    type="text"
+                                    name="metA"
+                                    value={this.state.metA}
+                                    onChange={this.handleChange}
+                                />
+                                metrix B:{}
+                                <input
+                                    id="metB_Gauss_Seidel"
+                                    type="text"
+                                    name="metB"
+                                    value={this.state.metB}
+                                    onChange={this.handleChange}
+                                />
+                            </label>
+                            <input type="submit" value="Submit" />
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    MatrixA :{" "}
+                                    {this.Convert_Latex(this.state.metA)}
+                                    <br></br>
+                                    MatrixB :{" "}
+                                    {this.Convert_Latex(this.state.metB)}
+                                </MathJax>
+                            </MathJaxContext>
                             Answer : {this.state.Matrix_Answer}
                         </form>
                     </div>
@@ -1104,10 +2083,15 @@ class Home extends React.Component {
                                 }
                             </label>
                             <input type="submit" value="Submit" />
-                            <h1>
-                                {this.state.metA}, {this.state.metB},{" "}
-                                {this.state.metX}, {this.state.X}
-                            </h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    MatrixA :{" "}
+                                    {this.Convert_Latex(this.state.metA)}
+                                    <br></br>
+                                    MatrixB :{" "}
+                                    {this.Convert_Latex(this.state.metB)}
+                                </MathJax>
+                            </MathJaxContext>
                             <h1 id="Newton's divided-differences" />{" "}
                             {/* <div>{this.Create_Graph()}</div> */}
                         </form>
@@ -1153,21 +2137,32 @@ class Home extends React.Component {
                                     name="metX"
                                     onChange={this.handleChange}
                                 />
-                                X_:
-                                {
-                                    <input
-                                        id="X_Newtondivided"
-                                        type="text"
-                                        name="X"
-                                        onChange={this.handleChange}
-                                    />
-                                }
+                                X_:{}
+                                <input
+                                    id="X_Newtondivided"
+                                    type="text"
+                                    name="X"
+                                    onChange={this.handleChange}
+                                />
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
                                 {this.state.metA}, {this.state.metB},{" "}
                                 {this.state.metX}, {this.state.X}
                             </h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    MatrixA :
+                                    {this.Convert_Latex(this.state.metA)}
+                                    <br></br>
+                                    MatrixB :
+                                    {this.Convert_Latex(this.state.metB)}
+                                    <br></br>
+                                    MatrixX :
+                                    {this.Convert_Latex(this.state.metX)}X :
+                                    {this.Convert_Latex(this.state.X)}
+                                </MathJax>
+                            </MathJaxContext>
                             <h1 id="Lagrange Interpolcation" />{" "}
                             {/* <div>{this.Create_Graph()}</div> */}
                         </form>
@@ -1206,29 +2201,72 @@ class Home extends React.Component {
                         >
                             One Point Iteration
                         </button>
+
+                        <button
+                            name="Newton_Raphson"
+                            onClick={this.CheckChapter}
+                        >
+                            Newton_Raphson
+                        </button>
+
                         <button
                             name="Secant_Method"
                             onClick={this.CheckChapter}
                         >
                             Secant Method
                         </button>
+
                         <br></br>
+
                         <button name="Cramer_Rule" onClick={this.CheckChapter}>
                             Cramer's Rule
                         </button>
+
                         <button
                             name="Gauss_Elimination"
                             onClick={this.CheckChapter}
                         >
                             Gauss Elimination
                         </button>
+
+                        <button name="Gauss_Jordan" onClick={this.CheckChapter}>
+                            Gauss Jordan
+                        </button>
+
+                        <button name="LU_Decompost" onClick={this.CheckChapter}>
+                            LU Decompost
+                        </button>
+
+                        <button
+                            name="Jacobi_Iteration"
+                            onClick={this.CheckChapter}
+                        >
+                            Jacobi Iteration
+                        </button>
+
+                        <button
+                            name="Gauss_Seidel_Iteration"
+                            onClick={this.CheckChapter}
+                        >
+                            Gauss Seidel Iteration
+                        </button>
+
+                        <button
+                            name="Conjugate_Gradient"
+                            onClick={this.CheckChapter}
+                        >
+                            Conjugate Gradient
+                        </button>
+
                         <br></br>
+
                         <button
                             name="Newton's_divided-differences"
                             onClick={this.CheckChapter}
                         >
                             Newton's divided-differences
                         </button>
+
                         <button
                             name="Lagrange_Interpolcation"
                             onClick={this.CheckChapter}
