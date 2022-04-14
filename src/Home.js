@@ -473,7 +473,6 @@ class Home extends React.Component {
     CheckChapter = (name) => {
         this.Answer = 0;
         this.tempEQ = [];
-        this.temp_arr = [];
         switch (name.target.name) {
             case "Bisection":
                 this.setState({
@@ -486,7 +485,6 @@ class Home extends React.Component {
                     API: [],
                     loading: true,
                 });
-                this.temp_arr = [];
                 break;
 
             case "False_Position":
@@ -669,77 +667,7 @@ class Home extends React.Component {
         return Math.abs((Xnew - Xold) / Xnew);
     };
 
-    temp_arr = [];
-    divided_arr = [];
-    count = 0;
-    temp_count = 0;
-    temp = 1;
     Answer = 0;
-
-    Recursive = (index1, index2) => {
-        var X = JSON.parse(this.state.metX);
-        var B = JSON.parse(this.state.metB);
-        var A = JSON.parse(this.state.metA);
-
-        if (this.temp_arr.length === 0) {
-            this.temp_arr.push(B[X[0] - 1]);
-            this.count++;
-        }
-
-        if (index1 > 0) {
-            // console.log(B[X[index1] - 1]);
-            // console.log(B[X[index2] - 1]);
-            // console.log(A[X[index1] - 1]);
-            // console.log(A[X[index2] - 1]);
-            this.temp_arr.push(
-                (B[X[index1] - 1] - B[X[index2] - 1]) /
-                    (A[X[index1] - 1] - A[X[index2] - 1])
-            );
-            this.count++;
-
-            // console.log((B[X[index1] - 1] - B[X[index2] - 1]) / (A[X[index1] - 1] - A[X[index2] - 1]));
-            if (this.count % 2 === 0 && index2 !== 0) {
-                // if (this.divided_arr.length === 0) {
-                //     this.divided_arr.push(this.)
-                // }
-                // this.divided_arr.push(
-                //     (this.temp_arr[this.count] -
-                //         this.temp_arr[this.count - 1]) /
-                //         A[index1] -
-                //         A[index2]
-                // );
-                // console.log(this.divided_arr);
-                console.log(this.temp_arr[this.count]);
-                console.log(this.temp_arr[this.count - 1]);
-                console.log(A[this.count - 1]);
-                console.log(A[this.count - 2]);
-            }
-
-            // if (index2 === 0) {
-            //     // console.log(A[B.length - 1]);
-            //     // console.log(A[index2]);
-
-            //     this.divided_arr.map((data) => {
-            //         if (this.Answer === 0) this.Answer = data;
-            //         else this.Answer -= data;
-            //     });
-
-            //     this.Answer = this.Answer / A[A.length - 1] - A[0];
-
-            //     A.map((data) => {
-            //         if (this.temp_count < this.count) {
-            //             this.temp *= parseFloat(this.state.X) - data;
-            //             console.log(parseFloat(this.state.X) - data);
-            //         }
-            //     });
-
-            //     this.Answer = this.Answer * this.temp;
-            // }
-
-            // console.log(B[X[index1] - 1], B[X[index2] - 1]);
-            return this.Recursive(index1 - 1, index2 - 1);
-        }
-    };
 
     ReplaceMatrix = (tempA, matA, index, tempB, matB) => {
         for (let i = 0; i < tempA.length; i++) {
@@ -825,6 +753,7 @@ class Home extends React.Component {
         var Xnew = 0;
         var count = 0;
         var Final_Answer = [];
+
         switch (this.state.Chapter) {
             case "Bisection":
                 this.Answer = (L + R) / 2;
@@ -833,7 +762,7 @@ class Home extends React.Component {
 
                 while (total > this.state.Criterion) {
                     this.Answer = (L + R) / 2;
-                    this.temp_arr.push({
+                    Final_Answer.push({
                         result: this.Answer,
                     });
                     YR = this.Convert_Eq(this.state.equation, R);
@@ -847,7 +776,7 @@ class Home extends React.Component {
                     }
                 }
                 this.setState({
-                    Array_Answer: this.temp_arr,
+                    Array_Answer: Final_Answer,
                 });
 
                 break;
@@ -869,20 +798,17 @@ class Home extends React.Component {
                         total = this.Cal_Error(R, this.Answer);
                         R = this.Answer;
                     }
-                    this.temp_arr.push({
+                    Final_Answer.push({
                         result: this.Answer,
                     });
                 }
-
                 this.setState({
-                    Array_Answer: this.temp_arr,
+                    Array_Answer: Final_Answer,
                 });
 
                 break;
 
             case "One_Point_Iteration":
-                this.temp_arr = [];
-
                 var Xold = JSON.parse(this.state.X0);
 
                 Xnew = 0;
@@ -895,13 +821,12 @@ class Home extends React.Component {
                         Xold = Xnew;
                     } else {
                         this.setState({
-                            CheckPush: true,
-                            Array_Answer: this.temp_arr,
+                            Array_Answer: Final_Answer,
                         });
                         this.Answer = Xold;
                         break;
                     }
-                    this.temp_arr.push({
+                    Final_Answer.push({
                         result: Xold,
                     });
                     // Count_loop++;
@@ -911,7 +836,6 @@ class Home extends React.Component {
 
             case "Newton_Raphson":
                 Xold = JSON.parse(this.state.X0);
-
                 while (total > this.state.Criterion) {
                     let deltaX =
                         -1 *
@@ -938,8 +862,6 @@ class Home extends React.Component {
                 break;
 
             case "Secant_Method":
-                this.temp_arr = [];
-
                 var X0 = parseFloat(this.state.X0);
                 var X1 = parseFloat(this.state.X1);
                 var Distance = X1 - X0;
@@ -957,7 +879,7 @@ class Home extends React.Component {
                     X0 = XKnew;
                     X1 = XKnew + Distance;
                 }
-                console.log(total);
+
                 this.Answer = XKnew;
 
                 this.setState({
@@ -1108,8 +1030,7 @@ class Home extends React.Component {
                 size = X.length;
 
                 // Initial X to be 0
-                for(let i = 0; i < size; i++)
-                {
+                for (let i = 0; i < size; i++) {
                     X[i] = 0;
                     Get_Error[i] = 0;
                     Temp_Step_2[i] = 0;
@@ -1117,47 +1038,42 @@ class Home extends React.Component {
 
                 var Step_1 = 0;
                 var Step_2 = 0;
-                
+
                 var WhenToBreak = 0;
-                while(true)
-                {
+                while (true) {
                     Temp_Step_2 = Array(Temp_Step_2.length).fill(0);
                     WhenToBreak = 0;
-                    for(let i = 0; i < size; i++)
-                    {
+                    for (let i = 0; i < size; i++) {
                         Step_2 = 0;
-                        for(let j = 0; j < size; j++)
-                        {
-                            if(i !== j)
-                            {
-                               Step_1 += A[i][j]*X[j];
+                        for (let j = 0; j < size; j++) {
+                            if (i !== j) {
+                                Step_1 += A[i][j] * X[j];
                             }
                         }
-                        Step_2 = (B[i]-Step_1)/A[i][i];
+                        Step_2 = (B[i] - Step_1) / A[i][i];
                         Temp_Step_2[i] = Step_2;
 
                         Step_1 = 0;
 
                         Get_Error[i] = this.Cal_Error(X[i], Step_2);
-                        if(Get_Error[i] > this.state.Criterion)
-                        {
+                        if (Get_Error[i] > this.state.Criterion) {
                             WhenToBreak++;
                         }
-                    }   
+                    }
                     X = Temp_Step_2;
 
-                    if(WhenToBreak === 0)
-                    {
-                        for(let i = 0; i < size; i++)
-                        {
+                    if (WhenToBreak === 0) {
+                        for (let i = 0; i < size; i++) {
                             Final_Answer.push(
-                                <h1>X{i} : {X[i]}</h1>
-                            )
+                                <h1>
+                                    X{i} : {X[i]}
+                                </h1>
+                            );
                         }
-                      
+
                         this.setState({
                             Matrix_Answer: Final_Answer,
-                        })
+                        });
                         break;
                     }
                 }
@@ -1172,8 +1088,7 @@ class Home extends React.Component {
                 size = X.length;
 
                 // Initial X to be 0
-                for(let i = 0; i < size; i++)
-                {
+                for (let i = 0; i < size; i++) {
                     X[i] = 0;
                     Get_Error[i] = 0;
                     Temp_Step_2[i] = 0;
@@ -1181,52 +1096,128 @@ class Home extends React.Component {
 
                 var Step_1 = 0;
                 var Step_2 = 0;
-                
+
                 var WhenToBreak = 0;
-                while(true)
-                {
+                while (true) {
                     WhenToBreak = 0;
-                    for(let i = 0; i < size; i++)
-                    {
+                    for (let i = 0; i < size; i++) {
                         Step_2 = 0;
-                        for(let j = 0; j < size; j++)
-                        {
-                            if(i !== j)
-                            {
-                               Step_1 += A[i][j]*X[j];
+                        for (let j = 0; j < size; j++) {
+                            if (i !== j) {
+                                Step_1 += A[i][j] * X[j];
                             }
                         }
-                        Step_2 = (B[i]-Step_1)/A[i][i];
+                        Step_2 = (B[i] - Step_1) / A[i][i];
                         Temp_Step_2[i] = Step_2;
 
                         Step_1 = 0;
 
                         Get_Error[i] = this.Cal_Error(X[i], Step_2);
-                        X[i] = Step_2
-                        if(Get_Error[i] > this.state.Criterion)
-                        {
+                        X[i] = Step_2;
+                        if (Get_Error[i] > this.state.Criterion) {
                             WhenToBreak++;
                         }
-                    }   
-                    console.log(Get_Error)
-                    if(WhenToBreak === 0)
-                    {
-                        for(let i = 0; i < size; i++)
-                        {
+                    }
+                    console.log(Get_Error);
+                    if (WhenToBreak === 0) {
+                        for (let i = 0; i < size; i++) {
                             Final_Answer.push(
-                                <h1>X{i} : {X[i]}</h1>
-                            )
+                                <h1>
+                                    X{i} : {X[i]}
+                                </h1>
+                            );
                         }
-                      
+
                         this.setState({
                             Matrix_Answer: Final_Answer,
-                        })
+                        });
                         break;
                     }
                 }
                 break;
 
             case "Conjugate_Gradient":
+                var A = JSON.parse(this.state.metA);
+                var B = JSON.parse(this.state.metB);
+                var X = Math.zeros(B.length);
+                // console.log(A,B,X)
+                for (let i = 0; i < size; i++) {
+                    X[i] = 0;
+                }
+                var size = B.length;
+                // Step_1 : R
+                var Step_1 = [];
+                // Step_2 : D
+                var Step_2 = [];
+                // Step_3 : Lambda
+                var Step_3 = 0;
+                // Step_4 : Xnew
+                var Step_4 = [];
+                // Step_5 : Rnew
+                var Step_5 = [];
+                // Total : Error
+                var Step_6 = total;
+                // Step_7 : alpha
+                var Step_7 = 0;
+                // Step_8 : Dnew
+                var Step_8 = [];
+
+                WhenToBreak = 0;
+                var R = [];
+                while (Step_6 > this.state.Criterion) {
+                    if (Step_6 === total) {
+                        Step_1 = Math.subtract(Math.multiply(X, A), B);
+                        Step_2 = Math.multiply(Step_1, -1);
+                    }
+                    // Step_2 = (Math.transpose(Step_2));
+                    Step_3 = Math.multiply(
+                        Math.multiply(Step_1, Math.transpose(Step_2)) /
+                            Math.multiply(
+                                Math.multiply(Math.transpose(Step_2), A),
+                                Step_2
+                            ),
+                        -1
+                    );
+                    Step_4 = Math.add(Math.multiply(Step_3, Step_2), X);
+                    Step_5 = Math.subtract(Math.multiply(A, Step_4), B);
+                    Step_6 = Math.sqrt(
+                        Math.multiply(Math.transpose(Step_5), Step_5)
+                    );
+                    Step_7 =
+                        Math.multiply(
+                            Math.multiply(Math.transpose(Step_5), A),
+                            Step_2
+                        ) /
+                        Math.multiply(
+                            Math.multiply(Math.transpose(Step_2), A),
+                            Step_2
+                        );
+                    Step_8 = Math.add(
+                        Math.multiply(Step_5, -1),
+                        Math.multiply(Step_7, Step_2)
+                    );
+                    Step_1 = Step_5;
+                    Step_2 = Step_8;
+                    X = Step_4;
+
+                    if (WhenToBreak > 100) {
+                        break;
+                    }
+                    WhenToBreak++;
+                }
+                X = JSON.parse(Step_4);
+                for (let i = 0; i < size; i++) {
+                    Final_Answer.push(
+                        <h1>
+                            X{i} : {X[i]}
+                        </h1>
+                    );
+                }
+
+                this.setState({
+                    Matrix_Answer: Final_Answer,
+                });
+
                 break;
 
             case "Newton's_divided-differences":
@@ -1435,7 +1426,6 @@ class Home extends React.Component {
                                     value={this.state.right}
                                     onChange={this.handleChange}
                                 />
-                                {(this.temp_arr = [])}
                             </label>
                             <input type="submit" value="Submit" />
                             <h1>
@@ -2019,15 +2009,17 @@ class Home extends React.Component {
                                 />
                             </label>
                             <input type="submit" value="Submit" />
-                            <MathJaxContext>
-                                <MathJax dynamic>
-                                    MatrixA :{" "}
-                                    {this.Convert_Latex(this.state.metA)}
-                                    <br></br>
-                                    MatrixB :{" "}
-                                    {this.Convert_Latex(this.state.metB)}
-                                </MathJax>
-                            </MathJaxContext>
+                            <h1>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        MatrixA :{" "}
+                                        {this.Convert_Latex(this.state.metA)}
+                                        <br></br>
+                                        MatrixB :{" "}
+                                        {this.Convert_Latex(this.state.metB)}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h1>
                             Answer : {this.state.Matrix_Answer}
                         </form>
                     </div>
