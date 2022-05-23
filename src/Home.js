@@ -15,6 +15,8 @@ import {
 } from "recharts";
 
 import { MathJax, MathJaxContext } from "better-react-mathjax";
+import { e, thomsonCrossSectionDependencies } from "mathjs";
+import { compileString } from "sass";
 
 class Home extends React.Component {
     constructor(props) {
@@ -78,6 +80,7 @@ class Home extends React.Component {
             Lower: 0,
             ExactAnswer: 0,
             Error: 0,
+            Order: "",
             FormulaForDiff: "",
             ModeForDiff: "",
             h: 0,
@@ -179,7 +182,7 @@ class Home extends React.Component {
     CheckEveryInput = true;
 
     GetDataFromManualInput = () => {
-        console.log(this.state.Chapter);
+        console.log(this.state.metA, this.state.metB, this.state.metX);
         this.CheckEveryInput = true;
         if (this.GetInputMatrix === true) {
             if(this.state.Chapter === "Lagrange_Interpolation")
@@ -240,7 +243,7 @@ class Home extends React.Component {
                             if (
                                 document.getElementById(i.toString() + j.toString())
                                     .value === "" ||
-                                document.getElementById(j.toString()).value === ""
+                                document.getElementById("B"+j.toString()).value === ""
                             ) {
                                 this.CheckEveryInput = false;
                                 alert("Please Enter Every fields!!!");
@@ -259,7 +262,7 @@ class Home extends React.Component {
                         } else {
                             GetMatrixBFromTable.push(
                                 JSON.parse(
-                                    document.getElementById(i.toString()).value
+                                    document.getElementById("B"+i.toString()).value
                                 )
                             );
                         }
@@ -271,11 +274,11 @@ class Home extends React.Component {
                         );
                     if(this.state.metA === [])
                     {
-                        alert("You want to submit your data?");
+                        alert("Do you want to submit your data?");
                     }
                     else if(this.state.metA !== JSON.stringify(GetMatrixAFromTable) || this.state.metB !== JSON.stringify(GetMatrixBFromTable))
                     {
-                        alert("You want to submit your data?");
+                        alert("Do you want to submit your data?");
                         this.setState({
                             metA: JSON.stringify(GetMatrixAFromTable),
                             metB: JSON.stringify(GetMatrixBFromTable)
@@ -290,6 +293,76 @@ class Home extends React.Component {
                 } catch(e) {}
             }
 
+            else if(this.state.Chapter === "Jacobi_Iteration" || 
+            this.state.Chapter === "Gauss_Seidel_Iteration" ||
+            this.state.Chapter === "Conjugate_Gradient")
+            {
+            // Get Data from Input Table
+            var TempMatrixA = [];
+            var GetMatrixBFromTable = [];
+            var GetMatrixXFromTable = [];
+            try {
+                for (let i = 0; i < this.state.row; i++) {
+                    for (let j = 0; j < this.state.column; j++) {
+                        if (
+                            document.getElementById(i.toString() + j.toString()).value === "" ||
+                            document.getElementById("B"+j.toString()).value === "" ||
+                            document.getElementById("X"+j.toString()).value === ""
+                        ) {
+                            this.CheckEveryInput = false;
+                            alert("Please Enter Every fields!!!");
+                            break;
+                        }
+                        TempMatrixA.push(
+                            JSON.parse(
+                                document.getElementById(
+                                    i.toString() + j.toString()
+                                ).value
+                            )
+                        );
+                    }
+                    GetMatrixBFromTable.push(
+                        JSON.parse(
+                            document.getElementById("B"+i.toString()).value
+                        )
+                    );
+                    GetMatrixXFromTable.push(
+                        JSON.parse(
+                            document.getElementById("X"+i.toString()).value
+                        )
+                    );
+                }
+                var GetMatrixAFromTable = [];
+                while (TempMatrixA.length)
+                    GetMatrixAFromTable.push(
+                        TempMatrixA.splice(0, this.state.column)
+                    );
+                console.log(GetMatrixXFromTable);
+                if(this.state.metA === [] || this.state.metB === [] || this.state.metX === [] )
+                {
+                    alert("Do you want to submit your data?");
+                }
+                else if(this.state.metA !== JSON.stringify(GetMatrixAFromTable) || 
+                this.state.metB !== JSON.stringify(GetMatrixBFromTable) || 
+                this.state.metX !== JSON.stringify(GetMatrixXFromTable))
+                {
+                    alert("Do you want to submit your data?");
+                    this.setState({
+                        metA: JSON.stringify(GetMatrixAFromTable),
+                        metB: JSON.stringify(GetMatrixBFromTable),
+                        metX: JSON.stringify(GetMatrixXFromTable)
+                    });
+                    return ;
+                }
+                else if(this.state.metA === JSON.stringify(GetMatrixAFromTable) && 
+                        this.state.metB === JSON.stringify(GetMatrixBFromTable) && 
+                        this.state.metX === JSON.stringify(GetMatrixXFromTable))
+                {
+                    this.Calculation();
+                    return ;
+                }
+            } catch(e) {}
+        }
             else if(this.state.Chapter === "Linear_Regression" || this.state.Chapter === "Polynomial_Regression")
             {
                 // Get Data from Input Table
@@ -315,11 +388,11 @@ class Home extends React.Component {
                     // Fix setstate Delay
                     if(this.state.metX === [])
                     {
-                        alert("You want to submit your data?");
+                        alert("Do you want to submit your data?");
                     }
                     else if(this.state.metX !== JSON.stringify(TempMatrixX) || this.state.metY !== JSON.stringify(TempMatrixY))
                     {
-                        alert("You want to submit your data?");
+                        alert("Do you want to submit your data?");
                         this.setState({
                             metX: JSON.stringify(TempMatrixX),
                             metY: JSON.stringify(TempMatrixY)
@@ -386,14 +459,14 @@ class Home extends React.Component {
 
                     if(this.state.met1 === [] || this.state.met2 === [] || this.state.met3 === [] || this.state.metY === [])
                     {
-                        alert("You want to submit your data?");
+                        alert("Do you want to submit your data?");
                     }
                     else if(this.state.met1 !== JSON.stringify(TempMatrixX1) ||
                             this.state.met2 !== JSON.stringify(TempMatrixX2) ||
                             this.state.met3 !== JSON.stringify(TempMatrixX3) || 
                             this.state.metY !== JSON.stringify(TempMatrixY))
                     {
-                        alert("You want to submit your data?");
+                        alert("Do you want to submit your data?");
                         this.setState({
                             met1: JSON.stringify(TempMatrixX1),
                             met2: JSON.stringify(TempMatrixX2),
@@ -506,7 +579,15 @@ class Home extends React.Component {
                     break; 
                           
                 case "Numerical_Differentiation":
-                    this.Calculation();
+                    if(this.state.equation === "" || this.state.ModeForDiff === "" || this.state.FormulaForDiff === "" ||
+                        this.state.X === 0 || this.state.h === 0)
+                    {
+                        alert("Please Enter every input!!!");
+                    }
+                    else
+                    {
+                        this.Calculation();
+                    }
                     break;   
 
                 default:
@@ -793,9 +874,11 @@ class Home extends React.Component {
                     equation: "",
                     X: 0,
                     h: 0,
+                    Order: "",
                     ModeForDiff: "",
                     FormulaForDiff: "",
-                    ExactAnswer: 0
+                    ExactAnswer: 0,
+                    Error: 0
                 })
                 break;
 
@@ -895,6 +978,7 @@ class Home extends React.Component {
         var Final_Answer = [];
         var Prove_Answer = "";
         this.Answer = 0;
+
         // var Answer_Show_Table = [];
         switch (this.state.Chapter) {
             case "Bisection":
@@ -1124,307 +1208,327 @@ class Home extends React.Component {
                 break;
 
             case "Gauss_Elimination":
-                // Initial Matrix A & B
-                var A = JSON.parse(this.state.metA);
-                var B = JSON.parse(this.state.metB);
-                console.log(A);
-                //Initial length of For
-                var size = A.length;
+                try {
+                    // Initial Matrix A & B
+                    var A = JSON.parse(this.state.metA);
+                    var B = JSON.parse(this.state.metB);
+                    console.log(A);
+                    //Initial length of For
+                    var size = A.length;
 
-                // Called function Forward Elimination
-                [A, B] = this.ForwardElimination(A, B, size);
-                // get divisor for each round when finding X
-                var round = 0;
+                    // Called function Forward Elimination
+                    [A, B] = this.ForwardElimination(A, B, size);
+                    // get divisor for each round when finding X
+                    var round = 0;
 
-                // set multiplier 1 & 2 to used when finding X
-                var multiplier_1 = 0;
-                var multiplier_2 = 0;
+                    // set multiplier 1 & 2 to used when finding X
+                    var multiplier_1 = 0;
+                    var multiplier_2 = 0;
 
-                // Initila Answer (X)
-                Final_Answer = JSON.parse(this.state.metB);
+                    // Initila Answer (X)
+                    Final_Answer = JSON.parse(this.state.metB);
 
-                // Array which used to push HTML then setstate to Matrix_Answer
-                var Answer_Gauss_Elimination = [];
+                    // Array which used to push HTML then setstate to Matrix_Answer
+                    var Answer_Gauss_Elimination = [];
 
-                var index = size - 1;
+                    var index = size - 1;
 
-                // Backward Substitution
-                for (let i = size - 1; i >= 0; i--) {
-                    multiplier_1 = 0;
-                    multiplier_2 = 0;
-                    round = B[i];
-                    for (let j = 0; j < size; j++) {
-                        if (i === j) {
-                            multiplier_1 += A[i][j];
-                        } else {
-                            multiplier_2 += Final_Answer[j] * A[i][j];
+                    // Backward Substitution
+                    for (let i = size - 1; i >= 0; i--) {
+                        multiplier_1 = 0;
+                        multiplier_2 = 0;
+                        round = B[i];
+                        for (let j = 0; j < size; j++) {
+                            if (i === j) {
+                                multiplier_1 += A[i][j];
+                            } else {
+                                multiplier_2 += Final_Answer[j] * A[i][j];
+                            }
+                            // console.log(multiplier_1, multiplier_2);
+                            if (j === size - 1) {
+                                round -= multiplier_2;
+                                round /= multiplier_1;
+                                Final_Answer[index] = round;
+
+                                Answer_Gauss_Elimination.push(
+                                    <p id={round} value={round}>
+                                        X{index} : {round}
+                                    </p>
+                                );
+                            }
                         }
-                        // console.log(multiplier_1, multiplier_2);
-                        if (j === size - 1) {
-                            round -= multiplier_2;
-                            round /= multiplier_1;
-                            Final_Answer[index] = round;
-
-                            Answer_Gauss_Elimination.push(
-                                <p id={round} value={round}>
-                                    X{index} : {round}
-                                </p>
-                            );
-                        }
+                        index--;
                     }
-                    index--;
-                }
 
-                this.setState({
-                    Matrix_Answer: Answer_Gauss_Elimination,
-                });
+                    this.setState({
+                        Matrix_Answer: Answer_Gauss_Elimination,
+                    });
+                }
+                catch(e) {}
                 break;
 
             case "Gauss_Jordan":
-                A = JSON.parse(this.state.metA);
-                B = JSON.parse(this.state.metB);
-
-                //Initial length of For
-                size = A.length;
-
-                // Called function Forward Elimination
-                [A, B] = this.ForwardElimination(A, B, size);
-
-                // console.log(A, B);
-                var Final_AnswerA = A;
-                var Final_AnswerB = B;
-
-                // console.log(this.state.D);
-                multiplier_1 = [];
-                multiplier_2 = [];
-
-                var a = A;
-                var b = B;
-                index = size - 1;
-
-                //Further Reduction
-                // for (let i = size - 1; i >= 0; i--) {
-                //     round = B[i];
-                //     var tb = 0;
-                //     for (let j = size - 1; j >= 0; j--) {
-                //         if (i === j) {
-                //             // Final_AnswerA[index][j] = A[i][j] / A[i][j];
-                //             Final_AnswerB[index] = B[j] / A[i][j];
-
-                //             // a[i-1][j] = a[i][j]*a[i-1][j];
-                //             b[index] = b[i]*a[i-1][j];
-                //             tb = b;
-                //         }
-                //         else{
-                //             // Final_AnswerA[index][j] = Final_AnswerA[i][j] - a[i][j];
-                //             Final_AnswerB[i] = Final_AnswerB[index] - tb[j];
-                //             // console.log(Final_AnswerB);
-                //             // console.log(Final_AnswerA);
-                //         }
-
-                //         console.log(Final_AnswerB);
-                //         // console.log(A);
-                //     }
-                //     index--;
-                // }
+                try
+                {
+                    A = JSON.parse(this.state.metA);
+                    B = JSON.parse(this.state.metB);
+    
+                    //Initial length of For
+                    size = A.length;
+    
+                    // Called function Forward Elimination
+                    [A, B] = this.ForwardElimination(A, B, size);
+    
+                    // console.log(A, B);
+                    var Final_AnswerA = A;
+                    var Final_AnswerB = B;
+    
+                    // console.log(this.state.D);
+                    multiplier_1 = [];
+                    multiplier_2 = [];
+    
+                    var a = A;
+                    var b = B;
+                    index = size - 1;
+    
+                    //Further Reduction
+                    // for (let i = size - 1; i >= 0; i--) {
+                    //     round = B[i];
+                    //     var tb = 0;
+                    //     for (let j = size - 1; j >= 0; j--) {
+                    //         if (i === j) {
+                    //             // Final_AnswerA[index][j] = A[i][j] / A[i][j];
+                    //             Final_AnswerB[index] = B[j] / A[i][j];
+    
+                    //             // a[i-1][j] = a[i][j]*a[i-1][j];
+                    //             b[index] = b[i]*a[i-1][j];
+                    //             tb = b;
+                    //         }
+                    //         else{
+                    //             // Final_AnswerA[index][j] = Final_AnswerA[i][j] - a[i][j];
+                    //             Final_AnswerB[i] = Final_AnswerB[index] - tb[j];
+                    //             // console.log(Final_AnswerB);
+                    //             // console.log(Final_AnswerA);
+                    //         }
+    
+                    //         console.log(Final_AnswerB);
+                    //         // console.log(A);
+                    //     }
+                    //     index--;
+                    // }
+                }
+                catch(e) {};
                 break;
 
             case "LU_Decompost":
+                try
+                {
+
+                }
+                catch(e) {};
                 break;
 
             case "Jacobi_Iteration":
-                var A = JSON.parse(this.state.metA);
-                var B = JSON.parse(this.state.metB);
-
-                // Initial X to be 0
-                var X = JSON.parse(this.state.metB);
-                var Get_Error = JSON.parse(this.state.metB);
-                var Temp_Step_2 = JSON.parse(this.state.metB);
-
-                for (let i = 0; i < B.length; i++) {
-                    X[i] = 0;
-                    Get_Error[i] = 0;
-                    Temp_Step_2[i] = 0;
-                }
-
-                size = X.length;
-
-                var Step_1 = 0;
-                var Step_2 = 0;
-
-                var WhenToBreak = 0;
-                while (true) {
-                    Temp_Step_2 = Math.zeros(B.length);
-                    WhenToBreak = 0;
-                    for (let i = 0; i < size; i++) {
-                        Step_2 = 0;
-                        for (let j = 0; j < size; j++) {
-                            if (i !== j) {
-                                Step_1 += A[i][j] * X[j];
+                try
+                {
+                    var A = JSON.parse(this.state.metA);
+                    var B = JSON.parse(this.state.metB);
+    
+                    // Initial X to be 0
+                    var X = JSON.parse(this.state.metB);
+                    var Get_Error = JSON.parse(this.state.metB);
+                    var Temp_Step_2 = JSON.parse(this.state.metB);
+    
+                    for (let i = 0; i < B.length; i++) {
+                        X[i] = 0;
+                        Get_Error[i] = 0;
+                        Temp_Step_2[i] = 0;
+                    }
+    
+                    size = X.length;
+    
+                    var Step_1 = 0;
+                    var Step_2 = 0;
+    
+                    var WhenToBreak = 0;
+                    while (true) {
+                        Temp_Step_2 = Math.zeros(B.length);
+                        WhenToBreak = 0;
+                        for (let i = 0; i < size; i++) {
+                            Step_2 = 0;
+                            for (let j = 0; j < size; j++) {
+                                if (i !== j) {
+                                    Step_1 += A[i][j] * X[j];
+                                }
+                            }
+                            Step_2 = (B[i] - Step_1) / A[i][i];
+                            Temp_Step_2[i] = Step_2;
+    
+                            Step_1 = 0;
+    
+                            Get_Error[i] = this.Cal_Error(X[i], Step_2);
+                            if (Get_Error[i] > this.state.Criterion) {
+                                WhenToBreak++;
                             }
                         }
-                        Step_2 = (B[i] - Step_1) / A[i][i];
-                        Temp_Step_2[i] = Step_2;
-
-                        Step_1 = 0;
-
-                        Get_Error[i] = this.Cal_Error(X[i], Step_2);
-                        if (Get_Error[i] > this.state.Criterion) {
-                            WhenToBreak++;
+                        X = Temp_Step_2;
+    
+                        if (WhenToBreak === 0) {
+                            for (let i = 0; i < size; i++) {
+                                Final_Answer.push(
+                                    <h1>
+                                        X{i} : {X[i]}
+                                    </h1>
+                                );
+                            }
+                            break;
                         }
+                        this.setState({
+                            Matrix_Answer: Final_Answer,
+                        });
                     }
-                    X = Temp_Step_2;
+                }
+                catch(e) {};
+                break;
 
-                    if (WhenToBreak === 0) {
+            case "Gauss_Seidel_Iteration":
+                try
+                {
+                    var A = JSON.parse(this.state.metA);
+                    var B = JSON.parse(this.state.metB);
+    
+                    var X = JSON.parse(this.state.metB);
+                    var Get_Error = JSON.parse(this.state.metB);
+                    // Initial X to be 0
+    
+                    for (let i = 0; i < B.length; i++) {
+                        X[i] = 0;
+                        Get_Error[i] = 0;
+                    }
+    
+                    size = X.length;
+    
+                    var Step_1 = 0;
+                    var Step_2 = 0;
+    
+                    var WhenToBreak = 0;
+                    while (true) {
+                        WhenToBreak = 0;
                         for (let i = 0; i < size; i++) {
-                            Final_Answer.push(
-                                <h1>
-                                    X{i} : {X[i]}
-                                </h1>
-                            );
+                            Step_2 = 0;
+                            for (let j = 0; j < size; j++) {
+                                if (i !== j) {
+                                    Step_1 += A[i][j] * X[j];
+                                }
+                            }
+                            Step_2 = (B[i] - Step_1) / A[i][i];
+                            // Temp_Step_2[i] = Step_2;
+    
+                            Step_1 = 0;
+    
+                            Get_Error[i] = this.Cal_Error(X[i], Step_2);
+                            X[i] = Step_2;
+                            if (Get_Error[i] > this.state.Criterion) {
+                                WhenToBreak++;
+                            }
                         }
-                        break;
+                        if (WhenToBreak === 0) {
+                            for (let i = 0; i < size; i++) {
+                                Final_Answer.push(
+                                    <h1>
+                                        X{i} : {X[i]}
+                                    </h1>
+                                );
+                            }
+                            break;
+                        }
                     }
                     this.setState({
                         Matrix_Answer: Final_Answer,
                     });
                 }
-                break;
-
-            case "Gauss_Seidel_Iteration":
-                var A = JSON.parse(this.state.metA);
-                var B = JSON.parse(this.state.metB);
-
-                var X = JSON.parse(this.state.metB);
-                var Get_Error = JSON.parse(this.state.metB);
-                // Initial X to be 0
-
-                for (let i = 0; i < B.length; i++) {
-                    X[i] = 0;
-                    Get_Error[i] = 0;
-                }
-
-                size = X.length;
-
-                var Step_1 = 0;
-                var Step_2 = 0;
-
-                var WhenToBreak = 0;
-                while (true) {
-                    WhenToBreak = 0;
-                    for (let i = 0; i < size; i++) {
-                        Step_2 = 0;
-                        for (let j = 0; j < size; j++) {
-                            if (i !== j) {
-                                Step_1 += A[i][j] * X[j];
-                            }
-                        }
-                        Step_2 = (B[i] - Step_1) / A[i][i];
-                        // Temp_Step_2[i] = Step_2;
-
-                        Step_1 = 0;
-
-                        Get_Error[i] = this.Cal_Error(X[i], Step_2);
-                        X[i] = Step_2;
-                        if (Get_Error[i] > this.state.Criterion) {
-                            WhenToBreak++;
-                        }
-                    }
-                    if (WhenToBreak === 0) {
-                        for (let i = 0; i < size; i++) {
-                            Final_Answer.push(
-                                <h1>
-                                    X{i} : {X[i]}
-                                </h1>
-                            );
-                        }
-                        break;
-                    }
-                }
-                this.setState({
-                    Matrix_Answer: Final_Answer,
-                });
+                catch(e) {};
                 break;
 
             case "Conjugate_Gradient":
-                var A = JSON.parse(this.state.metA);
-                var B = JSON.parse(this.state.metB);
-                var X = JSON.parse(this.state.metB);
-                // console.log(A,B,X)
-
-                for (let i = 0; i < B.length; i++) {
-                    X[i] = 0;
-                }
-
-                var size = B.length;
-
-                // Step_1 : R
-                var Step_1 = [];
-                // Step_2 : D
-                var Step_2 = [];
-                // Step_3 : Lambda
-                var Step_3 = 0;
-                // Step_4 : Xnew
-                var Step_4 = [];
-                // Step_5 : Rnew
-                var Step_5 = [];
-                // Total : Error
-                var Step_6 = total;
-                // Step_7 : alpha
-                var Step_7 = 0;
-                // Step_8 : Dnew
-                var Step_8 = [];
-
-                while (Step_6 > this.state.Criterion) {
-                    if (Step_6 === total) {
-                        Step_1 = Math.subtract(Math.multiply(X, A), B);
-                        Step_2 = Math.multiply(Step_1, -1);
-                    }
-                    Step_3 = Math.multiply(
-                        Math.multiply(Step_1, Math.transpose(Step_2)) /
+                try
+                {
+                    var A = JSON.parse(this.state.metA);
+                    var B = JSON.parse(this.state.metB);
+                    var X = JSON.parse(this.state.metX);
+                    // console.log(A,B,X)
+    
+                    var size = B.length;
+    
+                    // Step_1 : R
+                    var Step_1 = [];
+                    // Step_2 : D
+                    var Step_2 = [];
+                    // Step_3 : Lambda
+                    var Step_3 = 0;
+                    // Step_4 : Xnew
+                    var Step_4 = [];
+                    // Step_5 : Rnew
+                    var Step_5 = [];
+                    // Total : Error
+                    var Step_6 = total;
+                    // Step_7 : alpha
+                    var Step_7 = 0;
+                    // Step_8 : Dnew
+                    var Step_8 = [];
+    
+                    while (Step_6 > this.state.Criterion) {
+                        if (Step_6 === total) {
+                            Step_1 = Math.subtract(Math.multiply(X, A), B);
+                            Step_2 = Math.multiply(Step_1, -1);
+                        }
+                        Step_3 = Math.multiply(
+                            Math.multiply(Step_1, Math.transpose(Step_2)) /
+                                Math.multiply(
+                                    Math.multiply(Math.transpose(Step_2), A),
+                                    Step_2
+                                ),
+                            -1
+                        );
+                        Step_4 = Math.add(Math.multiply(Step_3, Step_2), X);
+                        Step_5 = Math.subtract(Math.multiply(A, Step_4), B);
+                        Step_6 = Math.sqrt(
+                            Math.multiply(Math.transpose(Step_5), Step_5)
+                        );
+                        Step_7 =
+                            Math.multiply(
+                                Math.multiply(Math.transpose(Step_5), A),
+                                Step_2
+                            ) /
                             Math.multiply(
                                 Math.multiply(Math.transpose(Step_2), A),
                                 Step_2
-                            ),
-                        -1
-                    );
-                    Step_4 = Math.add(Math.multiply(Step_3, Step_2), X);
-                    Step_5 = Math.subtract(Math.multiply(A, Step_4), B);
-                    Step_6 = Math.sqrt(
-                        Math.multiply(Math.transpose(Step_5), Step_5)
-                    );
-                    Step_7 =
-                        Math.multiply(
-                            Math.multiply(Math.transpose(Step_5), A),
-                            Step_2
-                        ) /
-                        Math.multiply(
-                            Math.multiply(Math.transpose(Step_2), A),
-                            Step_2
+                            );
+                        Step_8 = Math.add(
+                            Math.multiply(Step_5, -1),
+                            Math.multiply(Step_7, Step_2)
                         );
-                    Step_8 = Math.add(
-                        Math.multiply(Step_5, -1),
-                        Math.multiply(Step_7, Step_2)
-                    );
-                    Step_1 = Step_5;
-                    Step_2 = Step_8;
+                        Step_1 = Step_5;
+                        Step_2 = Step_8;
+                        X = Step_4;
+                    }
+    
                     X = Step_4;
+    
+                    for (let i = 0; i < B.length; i++) {
+                        Final_Answer.push(
+                            <h1>
+                                X{i} : {X[i]}
+                            </h1>
+                        );
+                    }
+    
+                    this.setState({
+                        Matrix_Answer: Final_Answer,
+                    });
+    
                 }
-
-                X = Step_4;
-
-                for (let i = 0; i < B.length; i++) {
-                    Final_Answer.push(
-                        <h1>
-                            X{i} : {X[i]}
-                        </h1>
-                    );
-                }
-
-                this.setState({
-                    Matrix_Answer: Final_Answer,
-                });
-
+                catch(e) {};
                 break;
 
             case "Newton's_divided-differences":
@@ -1691,8 +1795,285 @@ class Home extends React.Component {
                 break;
 
             case "Numerical_Differentiation":
+                var equation = this.state.equation;
+                var h = JSON.parse(this.state.h);
+                var X = JSON.parse(this.state.X);
+                // console.log(h, X);
+                this.Answer = 0;
+                var ExactAnswer = 0;
+                var Error = 0;
+                console.log(this.state.Order);
+                if(this.state.Order === "First Divided-Differences")
+                {
+                    switch (this.state.ModeForDiff) 
+                    {
+                        case "Forward":
+                            if(this.state.FormulaForDiff === "f^1*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X+h) - this.Convert_Eq(equation, X))/h;
+                                ExactAnswer = Math.derivative(equation, "x").evaluate({
+                                        x: X
+                                    });
+                                Error = ((ExactAnswer - this.Answer)/ExactAnswer)*100;
+                            }
+                            else if(this.state.FormulaForDiff === "f^2*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, (X+2*h)) - 
+                                                2*(this.Convert_Eq(equation, X+h)) + 
+                                                this.Convert_Eq(equation, X))/(h*h);
+                            }
+                            else if(this.state.FormulaForDiff === "f^3*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X+(3*h)) - 3*(this.Convert_Eq(equation, X+(2*h))) +
+                                3*(this.Convert_Eq(equation, X+h)) - this.Convert_Eq(equation, X))/(h*h*h)
+                            }
+                            else if(this.state.FormulaForDiff === "f^4*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X+(4*h)) - 
+                                                4*(this.Convert_Eq(equation, X+(3*h))) +
+                                                6*(this.Convert_Eq(equation, X+(2*h))) - 
+                                                4*(this.Convert_Eq(equation, X+h)) + 
+                                                this.Convert_Eq(equation, X))/(h*h*h);
+                            }
+                            break;
+
+                        case "Backward":
+                            if(this.state.FormulaForDiff === "f^1*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X) - this.Convert_Eq(equation, X-h))/h;
+                                ExactAnswer = Math.derivative(equation, "x").evaluate({
+                                        x: X
+                                    });
+                                Error = ((ExactAnswer - this.Answer)/ExactAnswer)*100;
+                            }
+                            else if(this.state.FormulaForDiff === "f^2*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X) - 
+                                                2*this.Convert_Eq(equation, (X-h)) + 
+                                                this.Convert_Eq(equation, (X-(2*h))))/(h*h);
+                            }
+                            else if(this.state.FormulaForDiff === "f^3*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X) - 
+                                                3*this.Convert_Eq(equation, (X-h)) + 
+                                                3*(this.Convert_Eq(equation, (X-(2*h)))) -
+                                                this.Convert_Eq(equation, (X-(3*h))))/(h*h*h);
+                            }
+                            else if(this.state.FormulaForDiff === "f^4*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X) - 
+                                                4*this.Convert_Eq(equation, (X-h)) + 
+                                                6*(this.Convert_Eq(equation, (X-(2*h)))) -
+                                                4*(this.Convert_Eq(equation, (X-(3*h)))) +
+                                                this.Convert_Eq(equation, (X-(4*h))))/(h*h*h*h);
+                            }
+                            break;
+
+                        case "Central":
+                            if(this.state.FormulaForDiff === "f^1*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X+h) - this.Convert_Eq(equation, X-h))/(2*h);
+                                ExactAnswer = Math.derivative(equation, "x").evaluate({
+                                        x: X
+                                    });
+                                Error = ((ExactAnswer - this.Answer)/ExactAnswer)*100;
+                            }
+                            else if(this.state.FormulaForDiff === "f^2*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X+h) - 
+                                                2*(this.Convert_Eq(equation, X)) +
+                                                this.Convert_Eq(equation, X-h)
+                                                )/(h*h);
+                            }
+                            else if(this.state.FormulaForDiff === "f^3*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X+(h*2)) - 
+                                                2*(this.Convert_Eq(equation, X+h)) + 
+                                                2*(this.Convert_Eq(equation, X-h)) -
+                                                this.Convert_Eq(equation, X-(h*2))
+                                                )/(2*(h*h*h));
+                            }
+                            else if(this.state.FormulaForDiff === "f^4*(x)")
+                            {
+                                this.Answer = (this.Convert_Eq(equation, X+(h*2)) 
+                                                - (4*this.Convert_Eq(equation, (X+h))) 
+                                                + (6*this.Convert_Eq(equation, X)) 
+                                                - (4*this.Convert_Eq(equation, (X+h))) 
+                                                + this.Convert_Eq(equation, X-(h*2))
+                                                )/(h*h*h*h);               
+                            }
+                            break;
+                    }
+                    break;
+                }
+                else 
+                {
+                    switch (this.state.ModeForDiff) 
+                    {
+                        case "Forward":
+                            if(this.state.FormulaForDiff === "f^1*(x)")
+                            {
+                                this.Answer = ((-1*(this.Convert_Eq(equation, X+(h*2))))
+                                                + (4*(this.Convert_Eq(equation, X+h)))
+                                                - (4*(this.Convert_Eq(equation, X))))/(2*h);
+                                ExactAnswer = Math.derivative(equation, "x").evaluate({
+                                        x: X
+                                    });
+                                Error = ((ExactAnswer - this.Answer)/ExactAnswer)*100;
+                            }
+                            else if(this.state.FormulaForDiff === "f^2*(x)")
+                            {
+                                this.Answer = ((-1*(this.Convert_Eq(equation, X+(h*3))))
+                                                + (4*(this.Convert_Eq(equation, X+(h*2))))
+                                                - (5*(this.Convert_Eq(equation, X+h)))
+                                                + (4*(this.Convert_Eq(equation, X))))/(h*h);
+                            }
+                            else if(this.state.FormulaForDiff === "f^3*(x)")
+                            {
+                                this.Answer = ((-3*(this.Convert_Eq(equation, X+(h*4))) )
+                                                + (14*(this.Convert_Eq(equation, X+(h*3))))
+                                                - (24*(this.Convert_Eq(equation, X+(h*2))))
+                                                + (18*(this.Convert_Eq(equation, X+h)))
+                                                - (18*(this.Convert_Eq(equation, X))))/(2*(h*h*h));
+                            }
+                            else if(this.state.FormulaForDiff === "f^4*(x)")
+                            {
+                                this.Answer = ((-2*(this.Convert_Eq(equation, X+(h*5)))) 
+                                                + (11*(this.Convert_Eq(equation, X+(h*4))))
+                                                - (24*(this.Convert_Eq(equation, X+(h*3))))
+                                                + (26*(this.Convert_Eq(equation, X+(h*2))))
+                                                - (14*(this.Convert_Eq(equation, X+(h*1))))
+                                                + (3*(this.Convert_Eq(equation, X))))/(h*h*h*h);
+                            }
+                            break;
+
+                        case "Backward":
+                            if(this.state.FormulaForDiff === "f^1*(x)")
+                            {
+                                this.Answer = ((3*(this.Convert_Eq(equation, X))) 
+                                                - (4*(this.Convert_Eq(equation, (X-h))))
+                                                + (this.Convert_Eq(equation, (X-(2*h)))))/(2*h);
+                                ExactAnswer = Math.derivative(equation, "x").evaluate({
+                                        x: X
+                                    });
+                                Error = ((ExactAnswer - this.Answer)/ExactAnswer)*100;
+                            }
+                            else if(this.state.FormulaForDiff === "f^2*(x)")
+                            {
+                                this.Answer = ((2*(this.Convert_Eq(equation, X))) 
+                                                - (5*(this.Convert_Eq(equation, (X-h))))
+                                                + (4*(this.Convert_Eq(equation, (X-(h*2)))))
+                                                - (this.Convert_Eq(equation, (X-(h*3)))))/(h*h);
+                            }
+                            else if(this.state.FormulaForDiff === "f^3*(x)")
+                            {
+                                this.Answer = ((5*(this.Convert_Eq(equation, X)))
+                                                - (18*(this.Convert_Eq(equation, (X-h))))
+                                                + (24*(this.Convert_Eq(equation, (X-(h*2)))))
+                                                - (14*(this.Convert_Eq(equation, (X-(h*3)))))
+                                                + (this.Convert_Eq(equation, (X-(h*4)))))/(2*(h*h*h));
+                            }
+                            else if(this.state.FormulaForDiff === "f^4*(x)")
+                            {
+                                this.Answer = ((3*(this.Convert_Eq(equation, X)))
+                                                - (14*(this.Convert_Eq(equation, (X-(h*1)))))
+                                                + (26*(this.Convert_Eq(equation, (X-(h*2)))))
+                                                - (24*(this.Convert_Eq(equation, (X-(h*3)))))
+                                                + (11*(this.Convert_Eq(equation, (X-(h*4)))))
+                                                - (2*(this.Convert_Eq(equation, (X-(h*5))))))/(h*h*h*h);
+                            }
+                            break;
+
+                        case "Central":
+                            if(this.state.FormulaForDiff === "f^1*(x)")
+                            {
+                                this.Answer = (-1*this.Convert_Eq(equation, X+(2*h)) 
+                                                + 8*this.Convert_Eq(equation, X+h)
+                                                - 8*this.Convert_Eq(equation, X-h)
+                                                + this.Convert_Eq(equation, X-(2*h)))/(12*h);
+                                ExactAnswer = Math.derivative(equation, "x").evaluate({
+                                        x: X
+                                    });
+                                Error = ((ExactAnswer - this.Answer)/ExactAnswer)*100;
+                            }
+                            else if(this.state.FormulaForDiff === "f^2*(x)")
+                            {
+                                this.Answer = ((-1*this.Convert_Eq(equation, X+(2*h))) 
+                                                + (16*(this.Convert_Eq(equation, X+h)))
+                                                - (30*(this.Convert_Eq(equation, X)))
+                                                + (16*(this.Convert_Eq(equation, X-h)))
+                                                - (this.Convert_Eq(equation, X-(2*h))))/(12*(h*h));
+                            }
+                            else if(this.state.FormulaForDiff === "f^3*(x)")
+                            {
+                                this.Answer = ((-1*(this.Convert_Eq(equation, X+(3*h))))
+                                                + (8*(this.Convert_Eq(equation, X+(2*h))))
+                                                - (13*(this.Convert_Eq(equation, X+h)))
+                                                + (13*(this.Convert_Eq(equation, X-h)))
+                                                - (8*(this.Convert_Eq(equation, X+(2*h))))
+                                                + (this.Convert_Eq(equation, X-(3*h))))/(8*(h*h*h));
+                            }
+                            else if(this.state.FormulaForDiff === "f^4*(x)")
+                            {
+                                this.Answer = ((-1*(this.Convert_Eq(equation, X+(3*h))))
+                                                + (12*(this.Convert_Eq(equation, X+(2*h))))
+                                                - (39*(this.Convert_Eq(equation, X+h)))
+                                                + (56*(this.Convert_Eq(equation, X)))
+                                                - (39*(this.Convert_Eq(equation, X-h)))
+                                                + (12*(this.Convert_Eq(equation, X-(2*h))))
+                                                - (this.Convert_Eq(equation, X-(3*h))))/(6*(h*h*h*h));             
+                            }
+                            break;
+                    }
+                }
+                if(ExactAnswer === 0 && Error === 0 && this.Answer !== 0)
+                {
+                    if(this.state.Actual_Answer === 0 && this.state.Error === 0 && this.state.ExactAnswer === 0)
+                    {
+                        alert("Do you want to submit your data?");
+                        this.setState({
+                            Actual_Answer: this.Answer,
+                            Error: 0,
+                            ExactAnswer: 0
+                        });
+                    }
+                    else if(this.state.Actual_Answer !== this.Answer ||
+                            this.state.Error !== Error ||
+                            this.state.ExactAnswer !== ExactAnswer)
+                    {
+                        alert("Do you want to submit your data?");
+                        this.setState({
+                            Actual_Answer: this.Answer,
+                            Error: 0,
+                            ExactAnswer: 0
+                        });
+                    }
+                }
+                else
+                {
+                    if(this.state.Actual_Answer === 0 && this.state.Error === 0 && this.state.ExactAnswer === 0)
+                    {
+                        alert("Do you want to submit your data?");
+                        this.setState({
+                            Actual_Answer: this.Answer,
+                            Error: Error,
+                            ExactAnswer: ExactAnswer
+                        });
+                    }
+                    else if(this.state.Actual_Answer !== this.Answer ||
+                            this.state.Error !== Error ||
+                            this.state.ExactAnswer !== ExactAnswer)
+                    {
+                        alert("Do you want to submit your data?");
+                        this.setState({
+                            Actual_Answer: this.Answer,
+                            Error: Error,
+                            ExactAnswer: ExactAnswer
+                        });
+                    }
+                }
                 break;
-            
+                
             default:
                 console.log("Null");
         }
@@ -1750,8 +2131,6 @@ class Home extends React.Component {
                 this.setState({
                     metA: splitValue[0],
                     metB: splitValue[1],
-                    DisplayMatrixA: splitValue[0],
-                    DisplayMatrixB: splitValue[1],
                 });
                 break;
 
@@ -1761,8 +2140,6 @@ class Home extends React.Component {
                 this.setState({
                     metA: splitValue[0],
                     metB: splitValue[1],
-                    DisplayMatrixA: splitValue[0],
-                    DisplayMatrixB: splitValue[1],
                 });
                 break;
 
@@ -1772,8 +2149,6 @@ class Home extends React.Component {
                 this.setState({
                     metA: splitValue[0],
                     metB: splitValue[1],
-                    DisplayMatrixA: splitValue[0],
-                    DisplayMatrixB: splitValue[1],
                 });
                 break;
 
@@ -1783,41 +2158,39 @@ class Home extends React.Component {
                 this.setState({
                     metA: splitValue[0],
                     metB: splitValue[1],
-                    DisplayMatrixA: splitValue[0],
-                    DisplayMatrixB: splitValue[1],
                 });
                 break;
 
             case "Jacobi_Iteration":
                 splitValue = event.target.value.split("|");
                 splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                splitValue[2] = splitValue[2].slice(2, splitValue[2].length)
                 this.setState({
                     metA: splitValue[0],
                     metB: splitValue[1],
-                    DisplayMatrixA: splitValue[0],
-                    DisplayMatrixB: splitValue[1],
+                    metX: splitValue[2],
                 });
                 break;
 
             case "Gauss_Seidel_Iteration":
                 splitValue = event.target.value.split("|");
                 splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                splitValue[2] = splitValue[2].slice(2, splitValue[2].length);
                 this.setState({
                     metA: splitValue[0],
                     metB: splitValue[1],
-                    DisplayMatrixA: splitValue[0],
-                    DisplayMatrixB: splitValue[1],
+                    metX: splitValue[2],
                 });
                 break;
 
             case "Conjugate_Gradient":
                 splitValue = event.target.value.split("|");
                 splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                splitValue[2] = splitValue[2].slice(2, splitValue[2].length);
                 this.setState({
                     metA: splitValue[0],
                     metB: splitValue[1],
-                    DisplayMatrixA: splitValue[0],
-                    DisplayMatrixB: splitValue[1],
+                    metX: splitValue[2],
                 });
                 break;
 
@@ -1991,7 +2364,7 @@ class Home extends React.Component {
     };
 
     // Generate Input MatrixB
-    generateMatrixBTable = (row, column) => {
+    generateMatrixBTable = (row, column, name) => {
         try {
             if (row < 2 || column < 2) {
                 this.GetInputMatrix = false;
@@ -2000,7 +2373,7 @@ class Home extends React.Component {
                 for (let i = 0; i < row; i++) {
                     Matrix_Table.push(
                         <tr>
-                            <input id={i.toString()} key={i.toString()}></input>
+                            <input id={name+i.toString()} key={name+i.toString()}></input>
                         </tr>
                     );
                     // console.log(i.toString());
@@ -2027,89 +2400,199 @@ class Home extends React.Component {
     // Manual Input Matric Chapter 2
     ShowInputChapter2 = (Data) => {
         var HTML = [];
-        if (this.state.ManualInput === true) {
-            this.GetInputMatrix = true;
-            HTML.push(
-                <form onSubmit={this.handleSubmit}>
-                    <label>
-                        Row:
-                        <input
-                            id="row_Cramer"
-                            type="number"
-                            name="row"
-                            value={this.state.row}
-                            onChange={this.handleChange}
-                        ></input>
-                        Column:
-                        <input
-                            id="row_Cramer"
-                            type="number"
-                            name="column"
-                            value={this.state.column}
-                            onChange={this.handleChange}
-                        />
-                        <br />
-                        Input MatrixA:
-                        <table>
-                            {this.generateMatrixATable(
-                                this.state.row,
-                                this.state.column
-                            )}
-                        </table>
-                        <br />
-                        Input MatrixB:
-                        <table>
-                            {this.generateMatrixBTable(
-                                this.state.row,
-                                this.state.column
-                            )}
-                        </table>
-                    </label>
-                    <input type="submit" value="Submit" />
-                    <h1>
-                        <MathJaxContext>
-                            <MathJax dynamic>
-                                MatrixA : {this.Convert_Latex(this.state.metA)}
-                                <br></br>
-                                MatrixB : {this.Convert_Latex(this.state.metB)}
-                            </MathJax>
-                        </MathJaxContext>
-                    </h1>
-                    Answer : {this.state.Matrix_Answer}
-                </form>
-            );
-            return HTML;
-        }
-        if (this.state.ManualInput === false) {
-            HTML = [];
-            this.GetInputMatrix = false;
-            HTML.push(
-                <div>
+        if(this.state.Chapter === "Cramer_Rule" ||
+        this.state.Chapter === "Gauss_Elimination" ||
+        this.state.Chapter === "Gauss_Jordan" ||
+        this.state.Chapter === "LU_Decompost")
+        {
+            if (this.state.ManualInput === true) {
+                this.GetInputMatrix = true;
+                HTML.push(
                     <form onSubmit={this.handleSubmit}>
-                        <select
-                            onChange={this.getEquationFromAPI}
-                            value={[this.state.metA, this.state.metB]}
-                        >
-                            <option value="">Choose Example Equation</option>
-                            {Data}
-                        </select>
+                        <label>
+                            Row:
+                            <input
+                                id="row_Cramer"
+                                type="number"
+                                name="row"
+                                value={this.state.row}
+                                onChange={this.handleChange}
+                            ></input>
+                            Column:
+                            <input
+                                id="row_Cramer"
+                                type="number"
+                                name="column"
+                                value={this.state.column}
+                                onChange={this.handleChange}
+                            />
+                            <br />
+                            Input MatrixA:
+                            <table>
+                                {this.generateMatrixATable(
+                                    this.state.row,
+                                    this.state.column
+                                )}
+                            </table>
+                            <br />
+                            Input MatrixB:
+                            <table>
+                                {this.generateMatrixBTable(
+                                    this.state.row,
+                                    this.state.column,
+                                    "B"
+                                )}
+                            </table>
+                        </label>
                         <input type="submit" value="Submit" />
                         <h1>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    MatrixA :{" "}
-                                    {this.Convert_Latex(this.state.metA)}
+                                    MatrixA : {this.Convert_Latex(this.state.metA)}
                                     <br></br>
-                                    MatrixB :{" "}
-                                    {this.Convert_Latex(this.state.metB)}
+                                    MatrixB : {this.Convert_Latex(this.state.metB)}
+                                    <br></br>
                                 </MathJax>
                             </MathJaxContext>
                         </h1>
                         Answer : {this.state.Matrix_Answer}
                     </form>
-                </div>
-            );
-            return HTML;
+                );
+                return HTML;
+            }
+            if (this.state.ManualInput === false) {
+                HTML = [];
+                this.GetInputMatrix = false;
+                HTML.push(
+                    <div>
+                        <form onSubmit={this.handleSubmit}>
+                            <select
+                                onChange={this.getEquationFromAPI}
+                                value={[this.state.metA, this.state.metB]}
+                            >
+                                <option value="">Choose Example Equation</option>
+                                {Data}
+                            </select>
+                            <input type="submit" value="Submit" />
+                            <h1>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        MatrixA :{" "}
+                                        {this.Convert_Latex(this.state.metA)}
+                                        <br></br>
+                                        MatrixB :{" "}
+                                        {this.Convert_Latex(this.state.metB)}
+                                        <br></br>
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h1>
+                            Answer : {this.state.Matrix_Answer}
+                        </form>
+                    </div>
+                );
+                return HTML;
+            }
+        }
+        else
+        {
+            if (this.state.ManualInput === true) {
+                this.GetInputMatrix = true;
+                HTML.push(
+                    <form onSubmit={this.handleSubmit}>
+                        <label>
+                            Row:
+                            <input
+                                id="row_Cramer"
+                                type="number"
+                                name="row"
+                                value={this.state.row}
+                                onChange={this.handleChange}
+                            ></input>
+                            Column:
+                            <input
+                                id="row_Cramer"
+                                type="number"
+                                name="column"
+                                value={this.state.column}
+                                onChange={this.handleChange}
+                            />
+                            <br />
+                            Input MatrixA:
+                            <table>
+                                {this.generateMatrixATable(
+                                    this.state.row,
+                                    this.state.column
+                                )}
+                            </table>
+                            <br />
+                            Input MatrixB:
+                            <table>
+                                {this.generateMatrixBTable(
+                                    this.state.row,
+                                    this.state.column,
+                                    "B"
+                                )}
+                            </table>
+                            Input MatrixX:
+                            <table>
+                                {this.generateMatrixBTable(
+                                    this.state.row,
+                                    this.state.column,
+                                    "X"
+                                )}
+                            </table>
+                        </label>
+                        <input type="submit" value="Submit" />
+                        <h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    MatrixA : {this.Convert_Latex(this.state.metA)}
+                                    <br></br>
+                                    MatrixB : {this.Convert_Latex(this.state.metB)}
+                                    <br></br>
+                                    MatrixX : {this.Convert_Latex(this.state.metX)}
+                                </MathJax>
+                            </MathJaxContext>
+                        </h1>
+                        Answer : {this.state.Matrix_Answer}
+                    </form>
+                );
+                return HTML;
+            }
+            if (this.state.ManualInput === false) {
+                HTML = [];
+                this.GetInputMatrix = false;
+                HTML.push(
+                    <div>
+                        <form onSubmit={this.handleSubmit}>
+                            <select
+                                onChange={this.getEquationFromAPI}
+                                value={[this.state.metA, this.state.metB, this.state.metX]}
+                            >
+                                <option value="">Choose Example Equation</option>
+                                {Data}
+                            </select>
+                            <input type="submit" value="Submit" />
+                            <h1>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        MatrixA :{" "}
+                                        {this.Convert_Latex(this.state.metA)}
+                                        <br></br>
+                                        MatrixB :{" "}
+                                        {this.Convert_Latex(this.state.metB)}
+                                        <br></br>
+                                        MatrixX :{" "}
+                                        {this.Convert_Latex(this.state.metX)}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h1>
+                            Answer : {this.state.Matrix_Answer}
+                        </form>
+                    </div>
+                );
+                return HTML;
+            }
         }
     };
 
@@ -2523,7 +3006,7 @@ class Home extends React.Component {
                 return HTML;
             }
         }
-        else if(this.state.Chapter === "Trapezoidal_Rule" || this.state.Chapter === "Simpson_Rule")
+        else if(this.state.Chapter === "Single_Trapezoidal_Rule" || this.state.Chapter === "Simpson_Rule")
         {
             if (this.state.ManualInput === true) {
                 this.GetInputMatrix = true;
@@ -2601,64 +3084,101 @@ class Home extends React.Component {
                 this.GetInputMatrix = true;
                 HTML.push(
                     <form onSubmit={this.handleSubmit}>
-                        <label>
-                            equation
-                            <input
-                                id="equation"
-                                type="text"
-                                name="equation"
-                                value={this.state.equation}
-                                onChange={this.handleChange}
-                            ></input>
-                            X:
-                            <input
-                                id="X"
-                                type="number"
-                                name="X"
-                                value={this.state.X}
-                                onChange={this.handleChange}
-                            />
-                            h:
-                            <input
-                                id="h"
-                                type="number"
-                                name="h"
-                                value={this.state.h}
-                                onChange={this.handleChange}
-                            />
-                            Mode:
-                            <select
-                                onChange={this.handleChange}
-                                value={this.state.ModeForDiff}
-                            >
-                                <option id="Forward" name="Forward" value="Forward">Forward</option>
-                                <option id="Backward" name="Backward" value="Backward">Backward</option>
-                                <option id="Central" name="Central" value="Central">Central</option>
-                            </select>
-                            Formula:
-                            <select
-                                onChange={this.handleChange}
-                                value={this.state.FormulaForDiff}
-                            >
-                                <option id="O(h)" name="O(h)" value="O(h)">O(h)</option>
-                                <option id="O(h^2)" name="O(h^2)" value="O(h^2)">O(h^2)</option>
-                                <option id="O(h^3)" name="O(h^3)" value="O(h^3)">O(h^3)</option>
-                                <option id="O(h^4)" name="O(h^4)" value="O(h^4)">O(h^4)</option>
-                            </select>
-                            <br />
-                        </label>
-                        <input type="submit" value="Submit" />
-                        <br/>
-                        Formula: {this.state.FormulaForDiff}
-                        <br/>
-                        Mode: {this.state.ModeForDiff}
-                        <br/>
-                        Differentiation From Formula : {this.state.Actual_Answer}
-                        <br/>
-                        Exact Differentiation : {this.state.ExactAnswer}
-                        <br/>
-                        Error : {this.state.Error}
-                        <br/>
+                        <MathJaxContext>
+                                <MathJax dynamic>
+                                    <label>
+                                        equation
+                                        <input
+                                            id="equation"
+                                            type="text"
+                                            name="equation"
+                                            value={this.state.equation}
+                                            onChange={this.handleChange}
+                                        ></input>
+                                        X:
+                                        <input
+                                            id="X"
+                                            type="number"
+                                            name="X"
+                                            value={this.state.X}
+                                            onChange={this.handleChange}
+                                        />
+                                        h:
+                                        <input
+                                            id="h"
+                                            type="number"
+                                            name="h"
+                                            value={this.state.h}
+                                            onChange={this.handleChange}
+                                        />
+                                    <br/>
+                                    Mode:
+                                    <select
+                                        onChange={this.handleChange}
+                                        name="ModeForDiff"
+                                    >
+                                        <option value="">Choose Mode</option>
+                                        <option value="Forward">Forward</option>
+                                        <option value="Backward">Backward</option>
+                                        <option value="Central">Central</option>
+                                    </select>
+                                    Formula:
+                                    <select
+                                        onChange={this.handleChange}
+                                        name="FormulaForDiff"
+                                    >
+                                        <option value="">Choose Formula</option>
+                                        <option id="f^1(x)" name="f^1(x)" value="f^1*(x)">f`(x)</option>
+                                        <option id="f^2*(x)" name="f^2*(x)" value="f^2*(x)">f``(x)</option>
+                                        <option id="f^3*(x)" name="f^3*(x)" value="f^3*(x)">f```(x)</option>
+                                        <option id="f^4*(x)" name="f^4*(x)" value="f^4*(x)">f````(x)</option>
+                                    </select>
+                                    Choose Method:
+                                    <select
+                                        onChange={this.handleChange}
+                                        value={this.state.Order}
+                                        name="Order"
+                                    >
+                                        <option value="">Choose Formula</option>
+                                        <option id="First Divided-Differences" 
+                                                name="First Divided-Differences" 
+                                                value="First Divided-Differences">
+                                                    First Divided-Differences
+                                        </option>
+                                        <option id="Second Divided-Differences" 
+                                                name="Second Divided-Differences" 
+                                                value="Second Divided-Differences">
+                                                    Second Divided-Differences
+                                        </option>
+                                    </select>
+                                <br/>
+                                    </label>
+                                    <input type="submit" value="Submit" />
+                                    <br/>
+                                    <br/>
+                                    Eqution : {this.Convert_Latex(this.state.equation)}
+                                    <br/>
+                                    <br/>
+                                    h: {this.Convert_Latex(this.state.h)}
+                                    <br/>
+                                    <br/>
+                                    Formula: {this.Convert_Latex(this.state.FormulaForDiff)}
+                                    <br/>
+                                    <br/>
+                                    Mode: {this.Convert_Latex(this.state.ModeForDiff)}
+                                    <br/>
+                                    <br/>
+                                    Differentiation From Formula : {this.state.Actual_Answer}
+                                    <br/>
+                                    <br/>
+                                    Exact Differentiation : {this.state.ExactAnswer}
+                                    <br/>
+                                    <br/>
+                                    Error : {this.state.Error}
+                                    <br/>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                     </form>
                 );
                 return HTML;
@@ -2669,44 +3189,86 @@ class Home extends React.Component {
                 HTML.push(
                     <div>
                         <form onSubmit={this.handleSubmit}>
-                            <select
-                                onChange={this.getEquationFromAPI}
-                                value={[this.state.equation, this.state.X, this.state.h]}
-                            >
-                                <option value="">Choose Example Equation</option>
-                                {Data}
-                            </select>
-                            Mode:
-                            <select
-                                onChange={this.handleChange}
-                                value={this.state.ModeForDiff}
-                            >
-                                <option id="Forward" name="Forward" value="Forward">Forward</option>
-                                <option id="Backward" name="Backward" value="Backward">Backward</option>
-                                <option id="Central" name="Central" value="Central">Central</option>
-                            </select>
-                            Formula:
-                            <select
-                                onChange={this.handleChange}
-                                value={this.state.FormulaForDiff}
-                            >
-                                <option id="O(h)" name="O(h)" value="O(h)">O(h)</option>
-                                <option id="O(h^2)" name="O(h^2)" value="O(h^2)">O(h^2)</option>
-                                <option id="O(h^3)" name="O(h^3)" value="O(h^3)">O(h^3)</option>
-                                <option id="O(h^4)" name="O(h^4)" value="O(h^4)">O(h^4)</option>
-                            </select>
-                            <input type="submit" value="Submit" />
-                            <br/>
-                            Formula: {this.state.FormulaForDiff}
-                            <br/>
-                            Mode: {this.state.ModeForDiff}
-                            <br/>
-                            Differentiation From Formula : {this.state.Actual_Answer}
-                            <br/>
-                            Exact Differentiation : {this.state.ExactAnswer}
-                            <br/>
-                            Error : {this.state.Error}
-                            <br/>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                <select
+                                    onChange={this.getEquationFromAPI}
+                                    value={[this.state.equation, this.state.X, this.state.h]}
+                                >
+                                    <option value="">Choose Example Equation</option>
+                                    {Data}
+                                </select>
+                                <br/>
+                                Mode:
+                                <select
+                                    onChange={this.handleChange}
+                                    name="ModeForDiff"
+                                >
+                                    <option value="">Choose Mode</option>
+                                    <option value="Forward">Forward</option>
+                                    <option value="Backward">Backward</option>
+                                    <option value="Central">Central</option>
+                                </select>
+                                Formula:
+                                <select
+                                    onChange={this.handleChange}
+                                    name="FormulaForDiff"
+                                >
+                                    <option value="">Choose Formula</option>
+                                    <option id="f^1(x)" name="f^1(x)" value="f^1*(x)">f`(x)</option>
+                                    <option id="f^2*(x)" name="f^2*(x)" value="f^2*(x)">f``(x)</option>
+                                    <option id="f^3*(x)" name="f^3*(x)" value="f^3*(x)">f```(x)</option>
+                                    <option id="f^4*(x)" name="f^4*(x)" value="f^4*(x)">f````(x)</option>
+                                </select>
+                                Choose Method:
+                                <select
+                                    onChange={this.handleChange}
+                                    value={this.state.Order}
+                                    name="Order"
+                                >
+                                    <option value="">Choose Formula</option>
+                                    <option id="First Divided-Differences" 
+                                            name="First Divided-Differences" 
+                                            value="First Divided-Differences">
+                                                First Divided-Differences
+                                    </option>
+                                    <option id="Second Divided-Differences" 
+                                            name="Second Divided-Differences" 
+                                            value="Second Divided-Differences">
+                                                Second Divided-Differences
+                                    </option>
+                                </select>
+                                <br/>
+                                <input type="submit" value="Submit" />
+                                <br/>
+                                <br/>
+
+                                Eqution : {this.Convert_Latex(this.state.equation)}
+                                <br/>
+                                <br/>
+                                h: {this.Convert_Latex(this.state.h)}
+                                <br/>
+                                <br/>
+                                Formula: {this.Convert_Latex(this.state.FormulaForDiff)}
+                                <br/>
+                                <br/>
+                                Mode: {this.Convert_Latex(this.state.ModeForDiff)}
+                                <br/>
+                                <br/>
+                                Mode: {this.Convert_Latex(this.state.Order)}
+                                <br/>
+                                <br/>
+                                Differentiation From Formula : {this.state.Actual_Answer}
+                                <br/>
+                                <br/>
+                                Exact Differentiation : {this.state.ExactAnswer}
+                                <br/>
+                                <br/>
+                                Error : {this.state.Error}
+                                <br/>
+                                <br/>
+                                </MathJax>
+                            </MathJaxContext>
                         </form>
                     </div>
                 );
@@ -2714,6 +3276,7 @@ class Home extends React.Component {
             }
         }
     }
+
     Input = () => {
         var Data = [];
         var GetData = 0;
@@ -3258,7 +3821,7 @@ class Home extends React.Component {
                             value={[
                                 GetData.metrixA,
                                 GetData.metrixB,
-                                // GetData.metrixX
+                                GetData.metrixX
                             ]}
                         >
                             {GetData.id}
@@ -3298,7 +3861,7 @@ class Home extends React.Component {
                             value={[
                                 GetData.metrixA,
                                 GetData.metrixB,
-                                // GetData.metrixX
+                                GetData.metrixX
                             ]}
                         >
                             {GetData.id}
@@ -3337,7 +3900,7 @@ class Home extends React.Component {
                             value={[
                                 GetData.metrixA,
                                 GetData.metrixB,
-                                // GetData.metrixX
+                                GetData.metrixX
                             ]}
                         >
                             {GetData.id}
@@ -3779,10 +4342,6 @@ class Home extends React.Component {
         }
     }
 
-    // Upload data to JSON server
-    // UploadData = () => {
-
-    // }
     //*** Generate Components ***//
     render = () => {
         // Get Data from JSON Server

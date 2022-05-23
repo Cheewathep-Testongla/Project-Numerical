@@ -29,12 +29,10 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "start": "npm-run-all -p start-ts server",
-    "start-ts": "react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "server": "json-server --watch ../backend/Chapter.json --port 3001 -m ./node_modules/json-server-auth"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
