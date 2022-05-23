@@ -7,21 +7,34 @@
     "@testing-library/react": "^12.0.0",
     "@testing-library/user-event": "^13.2.1",
     "better-react-mathjax": "^2.0.0",
+    "bootstrap": "^5.1.3",
+    "crypto-js": "^4.1.1",
+    "desmos": "^1.5.4",
+    "file-system": "^1.2.2",
+    "jquery": "^3.6.0",
+    "json-server-auth": "^2.1.0",
     "mathjax": "^3.2.0",
     "mathjs": "^10.1.1",
+    "node-sass": "^7.0.1",
+    "npm-run-all": "^4.1.5",
     "parse-js": "^0.7.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.2.1",
-    "react-scripts": "5.0.0",
+    "react-scripts": "^2.1.3",
+    "react-switch": "^6.0.0",
     "recharts": "^2.1.9",
+    "sass": "^1.51.0",
+    "scss": "^0.2.4",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "npm-run-all -p start-ts server",
+    "start-ts": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "json-server --watch ../backend/Chapter.json --port 3001 -m ./node_modules/json-server-auth"
   },
   "eslintConfig": {
     "extends": [

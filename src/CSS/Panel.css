@@ -1,9 +1,12 @@
 .Panel {
   text-align: center;
+  align-items: center;
+  align-content: center;
 }
 
 .super-header {
   margin-top: 2%;
+  background-color: green; 
   /* display: block; */
 }
 
@@ -70,7 +73,6 @@ body {
 
 h1 {
   font-weight: 900;
-  text-align: center;
 }
 
 h3 {
@@ -80,6 +82,10 @@ h3 {
 .flap {
   width: 100%;
   height: 100%;
+}
+
+.center {
+  align-content: center;
 }
 
 .flap::before {

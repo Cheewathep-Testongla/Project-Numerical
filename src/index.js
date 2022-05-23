@@ -9,7 +9,7 @@ ReactDOM.render(
     <React.StrictMode>
         <Router>
             <Routes>
-                <Route exact path="/" element={<Home />} />
+                <Route className="body" exact path="/" element={<Home />} />
             </Routes>
         </Router>
     </React.StrictMode>,
