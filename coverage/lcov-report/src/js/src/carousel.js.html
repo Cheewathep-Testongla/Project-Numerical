@@ -1,0 +1,1818 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/js/src/carousel.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="..\..\..\prettify.css" />
+    <link rel="stylesheet" href="..\..\..\base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(..\..\..\sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="..\..\..\index.html">All files</a> / <a href="index.html">src/js/src</a> carousel.js
+    </h1>
+    <div class='clearfix'>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589
+590
+591
+592</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * --------------------------------------------------------------------------
+ * Bootstrap (v5.1.3): carousel.js
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ * --------------------------------------------------------------------------
+ */
+&nbsp;
+import {
+  defineJQueryPlugin,
+  getElementFromSelector,
+  isRTL,
+  isVisible,
+  getNextActiveElement,
+  reflow,
+  triggerTransitionEnd,
+  typeCheckConfig
+} from './util/index'
+import EventHandler from './dom/event-handler'
+import Manipulator from './dom/manipulator'
+import SelectorEngine from './dom/selector-engine'
+import BaseComponent from './base-component'
+&nbsp;
+/**
+ * ------------------------------------------------------------------------
+ * Constants
+ * ------------------------------------------------------------------------
+ */
+&nbsp;
+const NAME = <span class="cstat-no" title="statement not covered" >'carousel'</span>
+const DATA_KEY = <span class="cstat-no" title="statement not covered" >'bs.carousel'</span>
+const EVENT_KEY = `<span class="cstat-no" title="statement not covered" >.${DATA_KEY}`</span>
+const DATA_API_KEY = <span class="cstat-no" title="statement not covered" >'.data-api'</span>
+&nbsp;
+const ARROW_LEFT_KEY = <span class="cstat-no" title="statement not covered" >'ArrowLeft'</span>
+const ARROW_RIGHT_KEY = <span class="cstat-no" title="statement not covered" >'ArrowRight'</span>
+const TOUCHEVENT_COMPAT_WAIT = <span class="cstat-no" title="statement not covered" >500 // Time for mouse compat events to fire after touch</span>
+const SWIPE_THRESHOLD = <span class="cstat-no" title="statement not covered" >40</span>
+&nbsp;
+const Default = <span class="cstat-no" title="statement not covered" >{</span>
+  interval: 5000,
+  keyboard: true,
+  slide: false,
+  pause: 'hover',
+  wrap: true,
+  touch: true
+}
+&nbsp;
+const DefaultType = <span class="cstat-no" title="statement not covered" >{</span>
+  interval: '(number|boolean)',
+  keyboard: 'boolean',
+  slide: '(boolean|string)',
+  pause: '(string|boolean)',
+  wrap: 'boolean',
+  touch: 'boolean'
+}
+&nbsp;
+const ORDER_NEXT = <span class="cstat-no" title="statement not covered" >'next'</span>
+const ORDER_PREV = <span class="cstat-no" title="statement not covered" >'prev'</span>
+const DIRECTION_LEFT = <span class="cstat-no" title="statement not covered" >'left'</span>
+const DIRECTION_RIGHT = <span class="cstat-no" title="statement not covered" >'right'</span>
+&nbsp;
+const KEY_TO_DIRECTION = <span class="cstat-no" title="statement not covered" >{</span>
+  [ARROW_LEFT_KEY]: DIRECTION_RIGHT,
+  [ARROW_RIGHT_KEY]: DIRECTION_LEFT
+}
+&nbsp;
+const EVENT_SLIDE = `<span class="cstat-no" title="statement not covered" >slide${EVENT_KEY}`</span>
+const EVENT_SLID = `<span class="cstat-no" title="statement not covered" >slid${EVENT_KEY}`</span>
+const EVENT_KEYDOWN = `<span class="cstat-no" title="statement not covered" >keydown${EVENT_KEY}`</span>
+const EVENT_MOUSEENTER = `<span class="cstat-no" title="statement not covered" >mouseenter${EVENT_KEY}`</span>
+const EVENT_MOUSELEAVE = `<span class="cstat-no" title="statement not covered" >mouseleave${EVENT_KEY}`</span>
+const EVENT_TOUCHSTART = `<span class="cstat-no" title="statement not covered" >touchstart${EVENT_KEY}`</span>
+const EVENT_TOUCHMOVE = `<span class="cstat-no" title="statement not covered" >touchmove${EVENT_KEY}`</span>
+const EVENT_TOUCHEND = `<span class="cstat-no" title="statement not covered" >touchend${EVENT_KEY}`</span>
+const EVENT_POINTERDOWN = `<span class="cstat-no" title="statement not covered" >pointerdown${EVENT_KEY}`</span>
+const EVENT_POINTERUP = `<span class="cstat-no" title="statement not covered" >pointerup${EVENT_KEY}`</span>
+const EVENT_DRAG_START = `<span class="cstat-no" title="statement not covered" >dragstart${EVENT_KEY}`</span>
+const EVENT_LOAD_DATA_API = `<span class="cstat-no" title="statement not covered" >load${EVENT_KEY}${DATA_API_KEY}`</span>
+const EVENT_CLICK_DATA_API = `<span class="cstat-no" title="statement not covered" >click${EVENT_KEY}${DATA_API_KEY}`</span>
+&nbsp;
+const CLASS_NAME_CAROUSEL = <span class="cstat-no" title="statement not covered" >'carousel'</span>
+const CLASS_NAME_ACTIVE = <span class="cstat-no" title="statement not covered" >'active'</span>
+const CLASS_NAME_SLIDE = <span class="cstat-no" title="statement not covered" >'slide'</span>
+const CLASS_NAME_END = <span class="cstat-no" title="statement not covered" >'carousel-item-end'</span>
+const CLASS_NAME_START = <span class="cstat-no" title="statement not covered" >'carousel-item-start'</span>
+const CLASS_NAME_NEXT = <span class="cstat-no" title="statement not covered" >'carousel-item-next'</span>
+const CLASS_NAME_PREV = <span class="cstat-no" title="statement not covered" >'carousel-item-prev'</span>
+const CLASS_NAME_POINTER_EVENT = <span class="cstat-no" title="statement not covered" >'pointer-event'</span>
+&nbsp;
+const SELECTOR_ACTIVE = <span class="cstat-no" title="statement not covered" >'.active'</span>
+const SELECTOR_ACTIVE_ITEM = <span class="cstat-no" title="statement not covered" >'.active.carousel-item'</span>
+const SELECTOR_ITEM = <span class="cstat-no" title="statement not covered" >'.carousel-item'</span>
+const SELECTOR_ITEM_IMG = <span class="cstat-no" title="statement not covered" >'.carousel-item img'</span>
+const SELECTOR_NEXT_PREV = <span class="cstat-no" title="statement not covered" >'.carousel-item-next, .carousel-item-prev'</span>
+const SELECTOR_INDICATORS = <span class="cstat-no" title="statement not covered" >'.carousel-indicators'</span>
+const SELECTOR_INDICATOR = <span class="cstat-no" title="statement not covered" >'[data-bs-target]'</span>
+const SELECTOR_DATA_SLIDE = <span class="cstat-no" title="statement not covered" >'[data-bs-slide], [data-bs-slide-to]'</span>
+const SELECTOR_DATA_RIDE = <span class="cstat-no" title="statement not covered" >'[data-bs-ride="carousel"]'</span>
+&nbsp;
+const POINTER_TYPE_TOUCH = <span class="cstat-no" title="statement not covered" >'touch'</span>
+const POINTER_TYPE_PEN = <span class="cstat-no" title="statement not covered" >'pen'</span>
+&nbsp;
+/**
+ * ------------------------------------------------------------------------
+ * Class Definition
+ * ------------------------------------------------------------------------
+ */
+class Carousel extends BaseComponent {
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  constructor</span>(</span>element, config) {
+<span class="cstat-no" title="statement not covered" >    super(element)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this._items = null</span>
+<span class="cstat-no" title="statement not covered" >    this._interval = null</span>
+<span class="cstat-no" title="statement not covered" >    this._activeElement = null</span>
+<span class="cstat-no" title="statement not covered" >    this._isPaused = false</span>
+<span class="cstat-no" title="statement not covered" >    this._isSliding = false</span>
+<span class="cstat-no" title="statement not covered" >    this.touchTimeout = null</span>
+<span class="cstat-no" title="statement not covered" >    this.touchStartX = 0</span>
+<span class="cstat-no" title="statement not covered" >    this.touchDeltaX = 0</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this._config = this._getConfig(config)</span>
+<span class="cstat-no" title="statement not covered" >    this._indicatorsElement = SelectorEngine.findOne(SELECTOR_INDICATORS, this._element)</span>
+<span class="cstat-no" title="statement not covered" >    this._touchSupported = 'ontouchstart' in document.documentElement || navigator.maxTouchPoints &gt; 0</span>
+<span class="cstat-no" title="statement not covered" >    this._pointerEvent = Boolean(window.PointerEvent)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this._addEventListeners()</span>
+  }
+&nbsp;
+  // Getters
+&nbsp;
+  static get <span class="fstat-no" title="function not covered" >Default<span class="fstat-no" title="function not covered" >() {</span></span>
+<span class="cstat-no" title="statement not covered" >    return Default</span>
+  }
+&nbsp;
+  static get <span class="fstat-no" title="function not covered" >NAME<span class="fstat-no" title="function not covered" >() {</span></span>
+<span class="cstat-no" title="statement not covered" >    return NAME</span>
+  }
+&nbsp;
+  // Public
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  next</span>() {</span>
+<span class="cstat-no" title="statement not covered" >    this._slide(ORDER_NEXT)</span>
+  }
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  nextWhenVisible</span>() {</span></span>
+    // Don't call next when the page isn't visible
+    // or the carousel or its parent isn't visible
+<span class="cstat-no" title="statement not covered" >    if (!document.hidden &amp;&amp; isVisible(this._element)) {</span>
+<span class="cstat-no" title="statement not covered" >      this.next()</span>
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  prev</span>() {</span>
+<span class="cstat-no" title="statement not covered" >    this._slide(ORDER_PREV)</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  pause</span>(</span>event) {
+<span class="cstat-no" title="statement not covered" >    if (!<span class="cstat-no" title="statement not covered" >event) {</span></span>
+<span class="cstat-no" title="statement not covered" >      this._isPaused = true</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (SelectorEngine.findOne(SELECTOR_NEXT_PREV, this._element)) {</span>
+<span class="cstat-no" title="statement not covered" >      triggerTransitionEnd(this._element)</span>
+<span class="cstat-no" title="statement not covered" >      this.cycle(true)</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    clearInterval(this._interval)</span>
+<span class="cstat-no" title="statement not covered" >    this._interval = null</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  cycle</span>(</span>event) {
+<span class="cstat-no" title="statement not covered" >    if (!<span class="cstat-no" title="statement not covered" >event) {</span></span>
+<span class="cstat-no" title="statement not covered" >      this._isPaused = false</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (this._interval) {</span>
+<span class="cstat-no" title="statement not covered" >      clearInterval(this._interval)</span>
+<span class="cstat-no" title="statement not covered" >      this._interval = null</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (this._config &amp;&amp; this._config.interval &amp;&amp; !this._isPaused) {</span>
+<span class="cstat-no" title="statement not covered" >      this._updateInterval()</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      this._interval = setInterval(</span>
+        (document.visibilityState ? this.nextWhenVisible : this.next).bind(this),
+        this._config.interval
+      )
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  to</span>(</span>index) {
+<span class="cstat-no" title="statement not covered" >    this._activeElement = SelectorEngine.findOne(SELECTOR_ACTIVE_ITEM, this._element)</span>
+    const activeIndex = <span class="cstat-no" title="statement not covered" >this._getItemIndex(this._activeElement)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (index &gt; this._items.length - 1 || index &lt; 0) {</span></span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (this._isSliding) {</span></span>
+<span class="cstat-no" title="statement not covered" >      EventHandler.one(this._element, EVENT_SLID, <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" ></span>this.to(index))</span></span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (activeIndex === index) {</span></span>
+<span class="cstat-no" title="statement not covered" >      this.pause()</span>
+<span class="cstat-no" title="statement not covered" >      this.cycle()</span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+    const order = <span class="cstat-no" title="statement not covered" >index &gt; activeIndex ?</span>
+      ORDER_NEXT :
+      ORDER_PREV
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this._slide(order, this._items[index])</span>
+  }
+&nbsp;
+  // Private
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _getConfig</span>(</span>config) {
+<span class="cstat-no" title="statement not covered" >    config = {</span>
+      ...Default,
+      ...Manipulator.getDataAttributes(this._element),
+      ...(typeof config === 'object' ? config : {})
+    }
+<span class="cstat-no" title="statement not covered" >    typeCheckConfig(NAME, config, DefaultType)</span>
+<span class="cstat-no" title="statement not covered" >    return config</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _handleSwipe</span>() {</span>
+    const absDeltax = <span class="cstat-no" title="statement not covered" >Math.abs(this.touchDeltaX)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (absDeltax &lt;= SWIPE_THRESHOLD) {</span></span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+    const direction = <span class="cstat-no" title="statement not covered" >absDeltax / this.touchDeltaX</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this.touchDeltaX = 0</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!direction) {</span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this._slide(direction &gt; 0 ? DIRECTION_RIGHT : DIRECTION_LEFT)</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _addEventListeners</span>() {</span>
+<span class="cstat-no" title="statement not covered" >    if (<span class="cstat-no" title="statement not covered" >this._config.keyboard) {</span></span>
+<span class="cstat-no" title="statement not covered" >      EventHandler.on(this._element, EVENT_KEYDOWN, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; <span class="cstat-no" title="statement not covered" ></span>this._keydown(event))</span></span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (this._config.pause === 'hover') {</span>
+<span class="cstat-no" title="statement not covered" >      EventHandler.on(this._element, EVENT_MOUSEENTER, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; <span class="cstat-no" title="statement not covered" ></span>this.pause(event))</span></span>
+<span class="cstat-no" title="statement not covered" >      EventHandler.on(this._element, EVENT_MOUSELEAVE, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; <span class="cstat-no" title="statement not covered" ></span>this.cycle(event))</span></span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (this._config.touch &amp;&amp; this._touchSupported) {</span>
+<span class="cstat-no" title="statement not covered" >      this._addTouchEventListeners()</span>
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _addTouchEventListeners</span>() {</span>
+    const hasPointerPenTouch = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >      return <span class="cstat-no" title="statement not covered" >this._pointerEvent &amp;&amp;</span></span>
+        (event.pointerType === POINTER_TYPE_PEN || event.pointerType === POINTER_TYPE_TOUCH)
+    }
+&nbsp;
+    const start = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; {</span></span></span>
+<span class="cstat-no" title="statement not covered" >      if (<span class="cstat-no" title="statement not covered" >hasPointerPenTouch(event)) {</span></span>
+<span class="cstat-no" title="statement not covered" >        this.touchStartX = event.clientX</span>
+      } else <span class="cstat-no" title="statement not covered" >if (!this._pointerEvent) {</span>
+<span class="cstat-no" title="statement not covered" >        this.touchStartX = event.touches[0].clientX</span>
+      }
+    }
+&nbsp;
+    const move = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; {</span></span></span>
+      // ensure swiping with one touch and not pinching
+<span class="cstat-no" title="statement not covered" >      this.touchDeltaX = event.touches &amp;&amp; event.touches.length &gt; 1 ?</span>
+        0 :
+        event.touches[0].clientX - this.touchStartX
+    }
+&nbsp;
+    const end = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; {</span></span></span>
+<span class="cstat-no" title="statement not covered" >      if (<span class="cstat-no" title="statement not covered" >hasPointerPenTouch(event)) {</span></span>
+<span class="cstat-no" title="statement not covered" >        this.touchDeltaX = event.clientX - this.touchStartX</span>
+      }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      this._handleSwipe()</span>
+<span class="cstat-no" title="statement not covered" >      if (this._config.pause === 'hover') {</span>
+        // If it's a touch-enabled device, mouseenter/leave are fired as
+        // part of the mouse compatibility events on first tap - the carousel
+        // would stop cycling until user tapped out of it;
+        // here, we listen for touchend, explicitly pause the carousel
+        // (as if it's the second time we tap on it, mouseenter compat event
+        // is NOT fired) and after a timeout (to allow for mouse compatibility
+        // events to fire) we explicitly restart cycling
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        this.pause()</span>
+<span class="cstat-no" title="statement not covered" >        if (this.touchTimeout) {</span>
+<span class="cstat-no" title="statement not covered" >          clearTimeout(this.touchTimeout)</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        this.touchTimeout = setTimeout(<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" ></span>this.cycle(event), TOUCHEVENT_COMPAT_WAIT + this._config.interval)</span></span></span>
+      }
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    SelectorEngine.find(SELECTOR_ITEM_IMG, this._element).forEach(<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >itemImg</span> =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >      EventHandler.on(itemImg, EVENT_DRAG_START, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; <span class="cstat-no" title="statement not covered" ></span>event.preventDefault())</span></span>
+    })
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (this._pointerEvent) {</span>
+<span class="cstat-no" title="statement not covered" >      EventHandler.on(this._element, EVENT_POINTERDOWN, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; <span class="cstat-no" title="statement not covered" ></span>start(event))</span></span>
+<span class="cstat-no" title="statement not covered" >      EventHandler.on(this._element, EVENT_POINTERUP, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; <span class="cstat-no" title="statement not covered" ></span>end(event))</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      this._element.classList.add(CLASS_NAME_POINTER_EVENT)</span>
+    } else {
+<span class="cstat-no" title="statement not covered" >      EventHandler.on(this._element, EVENT_TOUCHSTART, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; <span class="cstat-no" title="statement not covered" ></span>start(event))</span></span>
+<span class="cstat-no" title="statement not covered" >      EventHandler.on(this._element, EVENT_TOUCHMOVE, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; <span class="cstat-no" title="statement not covered" ></span>move(event))</span></span>
+<span class="cstat-no" title="statement not covered" >      EventHandler.on(this._element, EVENT_TOUCHEND, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >event</span> =&gt; <span class="cstat-no" title="statement not covered" ></span>end(event))</span></span>
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _keydown</span>(</span>event) {
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (/input|textarea/i.test(event.target.tagName)) {</span></span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+    const direction = <span class="cstat-no" title="statement not covered" >KEY_TO_DIRECTION[event.key]</span>
+<span class="cstat-no" title="statement not covered" >    if (<span class="cstat-no" title="statement not covered" >direction) {</span></span>
+<span class="cstat-no" title="statement not covered" >      event.preventDefault()</span>
+<span class="cstat-no" title="statement not covered" >      this._slide(direction)</span>
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _getItemIndex</span>(</span>element) {
+<span class="cstat-no" title="statement not covered" >    this._items = element &amp;&amp; element.parentNode ?</span>
+      SelectorEngine.find(SELECTOR_ITEM, element.parentNode) :
+      []
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return this._items.indexOf(element)</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _getItemByOrder</span>(</span>order, activeElement) {
+    const isNext = <span class="cstat-no" title="statement not covered" >order === ORDER_NEXT</span>
+<span class="cstat-no" title="statement not covered" >    return getNextActiveElement(this._items, activeElement, isNext, this._config.wrap)</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _triggerSlideEvent</span>(</span>relatedTarget, eventDirectionName) {
+    const targetIndex = <span class="cstat-no" title="statement not covered" >this._getItemIndex(relatedTarget)</span>
+    const fromIndex = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >this._getItemIndex(SelectorEngine.findOne(SELECTOR_ACTIVE_ITEM, this._element))</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return EventHandler.trigger(this._element, EVENT_SLIDE, {</span>
+      relatedTarget,
+      direction: eventDirectionName,
+      from: fromIndex,
+      to: targetIndex
+    })
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _setActiveIndicatorElement</span>(</span>element) {
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (this._indicatorsElement) {</span></span>
+      const activeIndicator = <span class="cstat-no" title="statement not covered" >SelectorEngine.findOne(SELECTOR_ACTIVE, this._indicatorsElement)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      activeIndicator.classList.remove(CLASS_NAME_ACTIVE)</span>
+<span class="cstat-no" title="statement not covered" >      activeIndicator.removeAttribute('aria-current')</span>
+&nbsp;
+      const indicators = <span class="cstat-no" title="statement not covered" >SelectorEngine.find(SELECTOR_INDICATOR, this._indicatorsElement)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >      for (let i = 0; i &lt; indicators.length; i++) {</span></span>
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >        if (Number.parseInt(indicators[i].getAttribute('data-bs-slide-to'), 10) === this._getItemIndex(element)) {</span></span>
+<span class="cstat-no" title="statement not covered" >          indicators[i].classList.add(CLASS_NAME_ACTIVE)</span>
+<span class="cstat-no" title="statement not covered" >          indicators[i].setAttribute('aria-current', 'true')</span>
+<span class="cstat-no" title="statement not covered" >          break</span>
+        }
+      }
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _updateInterval</span>() {</span>
+    const element = <span class="cstat-no" title="statement not covered" >this._activeElement || SelectorEngine.findOne(SELECTOR_ACTIVE_ITEM, this._element)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (!element) {</span></span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+    const elementInterval = <span class="cstat-no" title="statement not covered" >Number.parseInt(element.getAttribute('data-bs-interval'), 10)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (<span class="cstat-no" title="statement not covered" >elementInterval) {</span></span>
+<span class="cstat-no" title="statement not covered" >      this._config.defaultInterval = this._config.defaultInterval || this._config.interval</span>
+<span class="cstat-no" title="statement not covered" >      this._config.interval = elementInterval</span>
+    } else {
+<span class="cstat-no" title="statement not covered" >      this._config.interval = this._config.defaultInterval || this._config.interval</span>
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _slide</span>(</span>directionOrOrder, element) {
+    const order = <span class="cstat-no" title="statement not covered" >this._directionToOrder(directionOrOrder)</span>
+    const activeElement = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >SelectorEngine.findOne(SELECTOR_ACTIVE_ITEM, this._element)</span></span>
+    const activeElementIndex = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >this._getItemIndex(activeElement)</span></span>
+    const nextElement = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >element || this._getItemByOrder(order, activeElement)</span></span>
+&nbsp;
+    const nextElementIndex = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >this._getItemIndex(nextElement)</span></span>
+    const isCycling = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >Boolean(this._interval)</span></span>
+&nbsp;
+    const isNext = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >order === ORDER_NEXT</span></span>
+    const directionalClassName = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >isNext ? CLASS_NAME_START : CLASS_NAME_END</span></span>
+    const orderClassName = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >isNext ? CLASS_NAME_NEXT : CLASS_NAME_PREV</span></span>
+    const eventDirectionName = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >this._orderToDirection(order)</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (nextElement &amp;&amp; nextElement.classList.contains(CLASS_NAME_ACTIVE)) {</span></span>
+<span class="cstat-no" title="statement not covered" >      this._isSliding = false</span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (this._isSliding) {</span></span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+    const slideEvent = <span class="cstat-no" title="statement not covered" >this._triggerSlideEvent(nextElement, eventDirectionName)</span>
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (slideEvent.defaultPrevented) {</span></span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (!activeElement || !nextElement) {</span></span>
+      // Some weirdness is happening, so we bail
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this._isSliding = true</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (isCycling) {</span>
+<span class="cstat-no" title="statement not covered" >      this.pause()</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this._setActiveIndicatorElement(nextElement)</span>
+<span class="cstat-no" title="statement not covered" >    this._activeElement = nextElement</span>
+&nbsp;
+    const triggerSlidEvent = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >() =&gt; </span>{</span></span>
+<span class="cstat-no" title="statement not covered" >      EventHandler.trigger(this._element, EVENT_SLID, {</span>
+        relatedTarget: nextElement,
+        direction: eventDirectionName,
+        from: activeElementIndex,
+        to: nextElementIndex
+      })
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (this._element.classList.contains(CLASS_NAME_SLIDE)) {</span></span>
+<span class="cstat-no" title="statement not covered" >      nextElement.classList.add(orderClassName)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      reflow(nextElement)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      activeElement.classList.add(directionalClassName)</span>
+<span class="cstat-no" title="statement not covered" >      nextElement.classList.add(directionalClassName)</span>
+&nbsp;
+      const completeCallBack = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >() =&gt; </span>{</span></span>
+<span class="cstat-no" title="statement not covered" >        nextElement.classList.remove(directionalClassName, orderClassName)</span>
+<span class="cstat-no" title="statement not covered" >        nextElement.classList.add(CLASS_NAME_ACTIVE)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        activeElement.classList.remove(CLASS_NAME_ACTIVE, orderClassName, directionalClassName)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        this._isSliding = false</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        setTimeout(triggerSlidEvent, 0)</span>
+      }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      this._queueCallback(completeCallBack, activeElement, true)</span>
+    } else {
+<span class="cstat-no" title="statement not covered" >      activeElement.classList.remove(CLASS_NAME_ACTIVE)</span>
+<span class="cstat-no" title="statement not covered" >      nextElement.classList.add(CLASS_NAME_ACTIVE)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      this._isSliding = false</span>
+<span class="cstat-no" title="statement not covered" >      triggerSlidEvent(</span>)
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (<span class="cstat-no" title="statement not covered" >isCycling) {</span></span>
+<span class="cstat-no" title="statement not covered" >      this.cycle()</span>
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _directionToOrder</span>(</span>direction) {
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (![DIRECTION_RIGHT, DIRECTION_LEFT].includes(direction)) {</span></span>
+<span class="cstat-no" title="statement not covered" >      return direction</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (isRTL()) {</span>
+<span class="cstat-no" title="statement not covered" >      return direction === DIRECTION_LEFT ? ORDER_PREV : ORDER_NEXT</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return direction === DIRECTION_LEFT ? ORDER_NEXT : ORDER_PREV</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >  _orderToDirection</span>(</span>order) {
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (![ORDER_NEXT, ORDER_PREV].includes(order)) {</span></span>
+<span class="cstat-no" title="statement not covered" >      return order</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (isRTL()) {</span>
+<span class="cstat-no" title="statement not covered" >      return order === ORDER_PREV ? DIRECTION_LEFT : DIRECTION_RIGHT</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return order === ORDER_PREV ? DIRECTION_RIGHT : DIRECTION_LEFT</span>
+  }
+&nbsp;
+  // Static
+&nbsp;
+  static carouselInterface<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >(</span>element, config) {</span>
+    const data = <span class="cstat-no" title="statement not covered" >Carousel.getOrCreateInstance(element, config)</span>
+&nbsp;
+    let { _config } = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >data</span></span>
+<span class="cstat-no" title="statement not covered" >    if (typeof config === <span class="cstat-no" title="statement not covered" >'object') {</span></span>
+<span class="cstat-no" title="statement not covered" >      _config = {</span>
+        ..._config,
+        ...config
+      }
+    }
+&nbsp;
+    const action = <span class="cstat-no" title="statement not covered" >typeof config === <span class="cstat-no" title="statement not covered" >'string' ? config : _config.slide</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (typeof config === 'number') {</span></span>
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >      data.to(config)</span></span>
+    } else <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >if (typeof action === 'string') {</span></span>
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >      if (typeof data[action] === 'undefined') {</span></span>
+<span class="cstat-no" title="statement not covered" >        throw new TypeError(`No method named "${action}"`)</span>
+      }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      data[action]()</span>
+    } else <span class="cstat-no" title="statement not covered" >if (<span class="cstat-no" title="statement not covered" >_config.interval &amp;&amp; _config.ride) {</span></span>
+<span class="cstat-no" title="statement not covered" >      data.pause()</span>
+<span class="cstat-no" title="statement not covered" >      data.cycle()</span>
+    }
+  }
+&nbsp;
+  static jQueryInterface<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >(</span>config) {</span>
+<span class="cstat-no" title="statement not covered" >    return this.each(<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >function () </span>{</span></span>
+<span class="cstat-no" title="statement not covered" >      Carousel.carouselInterface(this, config)</span>
+    })
+  }
+&nbsp;
+  static dataApiClickHandler<span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >(</span>event) {</span>
+    const target = <span class="cstat-no" title="statement not covered" >getElementFromSelector(this)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >    if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) {</span></span>
+<span class="cstat-no" title="statement not covered" >      return</span>
+    }
+&nbsp;
+    const <span class="cstat-no" title="statement not covered" >config<span class="cstat-no" title="statement not covered" > = {</span></span>
+      ...Manipulator.getDataAttributes(target),
+      ...Manipulator.getDataAttributes(this)
+    }
+    const slideIndex = <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >this.getAttribute('data-bs-slide-to')</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (<span class="cstat-no" title="statement not covered" >slideIndex) {</span></span>
+<span class="cstat-no" title="statement not covered" >      config.interval = false</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    Carousel.carouselInterface(target, config)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (slideIndex) {</span>
+<span class="cstat-no" title="statement not covered" >      Carousel.getInstance(target).to(slideIndex)</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    event.preventDefault()</span>
+  }
+}
+&nbsp;
+/**
+ * ------------------------------------------------------------------------
+ * Data Api implementation
+ * ------------------------------------------------------------------------
+ */
+&nbsp;
+<span class="cstat-no" title="statement not covered" >EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_SLIDE, Carousel.dataApiClickHandler)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >EventHandler.on(window, EVENT_LOAD_DATA_API, <span class="fstat-no" title="function not covered" ><span class="fstat-no" title="function not covered" >() =&gt; </span>{</span></span>
+  const carousels = <span class="cstat-no" title="statement not covered" >SelectorEngine.find(SELECTOR_DATA_RIDE)</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >  for (let i = 0, len = carousels.length; i &lt; len; i++) {</span></span>
+<span class="cstat-no" title="statement not covered" >    Carousel.carouselInterface(carousels[i], Carousel.getInstance(carousels[i]))</span>
+  }
+})
+&nbsp;
+/**
+ * ------------------------------------------------------------------------
+ * jQuery
+ * ------------------------------------------------------------------------
+ * add .Carousel to jQuery only if jQuery is present
+ */
+&nbsp;
+<span class="cstat-no" title="statement not covered" >defineJQueryPlugin(Carousel)</span>
+&nbsp;
+export default Carousel
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Wed May 25 2022 00:59:06 GMT+0700 (Indochina Time)
+</div>
+</div>
+<script src="..\..\..\prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="..\..\..\sorter.js"></script>
+</body>
+</html>
