@@ -15,20 +15,19 @@ import {
 } from "recharts";
 
 import { MathJax, MathJaxContext } from "better-react-mathjax";
-import { thomsonCrossSectionDependencies } from "mathjs";
 
 class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             //Token
-            Account: (<h4 class="text">Guest User</h4>),
+            Account: (<h4 className="text" data-testid="Guest User" value="Guest User">Guest User</h4>),
             // PostData: [<button onChange={this.UploadData}>Upload Equation</button>],
-            HTML:   (<form className="Login" onSubmit={this.GetToken}>
+            HTML:   (<form className="Login" name="Login" onSubmit={this.GetToken}>
                         <div>Username</div>
-                        <input className="Input-Login" id="UserName" type="text" name="UserName" onChange={this.handleChange}></input>
+                        <input className="Input-Login" id="UserName" type="text" data-testid="UserName" name="UserName" onChange={this.handleChange}></input>
                         <div>Password</div>
-                        <input className="Input-Login" id="Password" type="password" name="Password" onChange={this.handleChange}></input>
+                        <input className="Input-Login" id="Password" type="password" data-testid="Password" name="Password" onChange={this.handleChange}></input>
                         <br></br>
                         <input type="submit" value="Submit"/>
                     </form>
@@ -4294,7 +4293,12 @@ class Home extends React.Component {
                     }
                     return (
                         <div>
-                            <h1>Linear Regression</h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h3>Linear Regression</h3>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                             <label>
                                 Manual Input : <input
                                     type="checkbox"
@@ -4326,7 +4330,12 @@ class Home extends React.Component {
                     }
                     return (
                         <div>
-                            <h1>Polynomial Regression</h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h3>Polynomial Regression</h3>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                             <label>
                                 Manual Input : <input
                                     type="checkbox"
@@ -4359,7 +4368,12 @@ class Home extends React.Component {
                     }
                     return (
                         <div>
-                            <h1>Multiple Linear Regression</h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h3>Multiple Linear Regression</h3>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                             <label>
                                 Manual Input : <input
                                     type="checkbox"
@@ -4391,7 +4405,12 @@ class Home extends React.Component {
                     }
                     return (
                         <div>
-                            <h1>Single Trapezoidal Rule</h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h3>Single Trapezoidal Rule</h3>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                             <label>
                                 Manual Input : <input
                                     type="checkbox"
@@ -4423,7 +4442,12 @@ class Home extends React.Component {
                     }
                     return (
                         <div>
-                            <h1>Composite Trapezoidal Rule</h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    Composite Trapezoidal Rule
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                             <label>
                                 Manual Input : <input
                                     type="checkbox"
@@ -4455,7 +4479,12 @@ class Home extends React.Component {
                     }
                     return (
                         <div>
-                            <h1>Simpson's Rule</h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h3>Simpson's Rule</h3>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                             <label>
                                 Manual Input : <input
                                     type="checkbox"
@@ -4487,7 +4516,12 @@ class Home extends React.Component {
                     }
                     return (
                         <div>
-                            <h1>Composite Simpson's Rule</h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h3>Composite Simpson's Rule</h3>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                             <label>
                                 Manual Input : <input
                                     type="checkbox"
@@ -4519,7 +4553,12 @@ class Home extends React.Component {
                     }
                     return (
                         <div>
-                            <h1>Numerical Differentiation</h1>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h3>Numerical Differentiation</h3>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                             <label>
                                 Manual Input : <input
                                     type="checkbox"
@@ -4536,7 +4575,7 @@ class Home extends React.Component {
                 default:
                     return (
                         <label>
-                            <h2>Welcome To Website Numerical Method Calculator</h2>
+                            <h2 data-testid="AlreadyLogin" value="AlreadyLogin">Welcome To Website Numerical Method Calculator</h2>
                             <hr/>
                             <div>Authorize By Cheewathep Testongla</div>
                         </label>
@@ -4545,7 +4584,7 @@ class Home extends React.Component {
         }
         else 
         {
-            this.DisplayPleaseLogin = [<h2>Please Log in To used website</h2>]
+            this.DisplayPleaseLogin = [<h2 data-testid="PleaseLogin" value="PleaseLogin">Please Log in To used website</h2>]
         }
     };
         
@@ -4559,9 +4598,9 @@ class Home extends React.Component {
             console.log("Match");
                 this.setState({
                     GetDataFirstTime: false,
-                    HTML: (<button onClick={this.Logout}>Logout</button>),
+                    HTML: (<button data-testid="Logout" value="Logout" onClick={this.Logout}>Logout</button>),
                     HaveToken: true,
-                    Account: (<h3 className="login">{this.state.UserName}</h3>)
+                    Account: (<h3 value={this.state.UserName} className="login">{this.state.UserName}</h3>)
                 });
         }
         else 
@@ -4578,9 +4617,9 @@ class Home extends React.Component {
                             <input type="submit" value="Submit"/>
                         </form>),
                 HaveToken: false,
-                GetDataFirstTime: true,
+                GetDataFirstTime: false,
                 DataFromAPI : [],
-                Account: (<h3 className="text">Guest User</h3>)
+                Account: (<h3 value="Guest User" className="text">Guest User</h3>)
             })
         }
     } 
@@ -4622,7 +4661,7 @@ class Home extends React.Component {
                 Password: '',
                 DataFromAPI: [],
                 GetDataFirstTime: true,
-                Account: (<h3 className="login">Guest User</h3>)
+                Account: (<h3 value="Guest User" className="login">Guest User</h3>)
             })
         }
     }
@@ -4636,27 +4675,29 @@ class Home extends React.Component {
                 .then((resp) => resp.json())
                 .then((data) => {
                     this.setState({
-                        DataFromAPI : data
+                        DataFromAPI : data,
+                        GetDataFirstTime: false,
                     })
             });
         }
         return (
             <>
                 <div className="Super-Background">
-                    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-                        <div class="container-fluid">
-                            <h5 class="navbar-brand">Numerical Method</h5>
-                            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li class="nav-item dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+                        <div className="container-fluid">
+                            <h5 className="navbar-brand">Numerical Method</h5>
+                            <div className="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li className="nav-item dropdown">
+                                <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                     Root Of Equation
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <ul data-testid="Root_Of_Equation" value="Root_Of_Equation" className="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li 
                                         id='Bisection'
-                                        class="dropdown-item"
+                                        className="dropdown-item"
                                         name="Bisection"
+                                        value="Bisection"
                                         onClick={this.CheckChapter}
                                     >
                                         Bisection
@@ -4665,6 +4706,7 @@ class Home extends React.Component {
                                         id='False_Position'
                                         className="dropdown-item"
                                         name="False_Position"
+                                        value="False_Position"
                                         onClick={this.CheckChapter}
                                     >
                                         False Position Method
@@ -4673,6 +4715,7 @@ class Home extends React.Component {
                                         id='One_Point_Iteration'
                                         className="dropdown-item"
                                         name="One_Point_Iteration"
+                                        value="One_Point_Iteration"
                                         onClick={this.CheckChapter}
                                     >
                                         One Point Iteration
@@ -4682,6 +4725,7 @@ class Home extends React.Component {
                                         id='Newton_Raphson'
                                         className="dropdown-item"
                                         name="Newton_Raphson"
+                                        value="Newton_Raphson"
                                         onClick={this.CheckChapter}
                                     >
                                         Newton Raphson
@@ -4691,6 +4735,7 @@ class Home extends React.Component {
                                         id='Secant_Method'
                                         className="dropdown-item"
                                         name="Secant_Method"
+                                        value="Secant_Method"
                                         onClick={this.CheckChapter}
                                     >
                                         Secant Method
@@ -4699,15 +4744,15 @@ class Home extends React.Component {
                                 </li>
                             </ul>
                             {/* Chapter 2 */}
-                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li class="nav-item dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li className="nav-item dropdown">
+                                <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                     Solution Of Linear Algebraic Equations
                                 </button>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                                         <li 
                                             id='Cramer_Rule'
-                                            class="dropdown-item"
+                                            className="dropdown-item"
                                             name="BisectCramer_Ruleion"
                                             onClick={this.CheckChapter}
                                         >
@@ -4769,15 +4814,15 @@ class Home extends React.Component {
                                 </li>
                             </ul>
                             {/* Chapter 3 */}
-                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li class="nav-item dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li className="nav-item dropdown">
+                                    <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                         Interpolation And Extrapolation
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                                         <li 
                                             id="Newton's_divided-differences"
-                                            class="dropdown-item"
+                                            className="dropdown-item"
                                             name="Newton's_divided-differences"
                                             onClick={this.CheckChapter}
                                         >
@@ -4803,15 +4848,15 @@ class Home extends React.Component {
                                 </li>
                             </ul>
                             {/* Chapter 4 */}
-                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li class="nav-item dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li className="nav-item dropdown">
+                                    <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                         Least-Squares Regression
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                                         <li 
                                             id="Linear_Regression"
-                                            class="dropdown-item"
+                                            className="dropdown-item"
                                             name="Linear_Regression"
                                             onClick={this.CheckChapter}
                                         >
@@ -4837,12 +4882,12 @@ class Home extends React.Component {
                                 </li>
                             </ul>
                             {/* Chapter 5 */}
-                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                                <li class="nav-item dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li className="nav-item dropdown">
+                                <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                     Numerical Integration And Diffrentiation
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li
                                         id='Single_Trapezoidal_Rule'
                                         className="dropdown-item"
@@ -4860,7 +4905,7 @@ class Home extends React.Component {
                                     >
                                         Composite Trapezoidal Rule
                                     </li>
-                                    <hr class="dropdown-divider"></hr>
+                                    <hr className="dropdown-divider"></hr>
                                     <li
                                         id='Simpson_Rule'
                                         className="dropdown-item"
@@ -4878,10 +4923,10 @@ class Home extends React.Component {
                                     >
                                         Composite Simpson's Rule
                                     </li>
-                                    <hr class="dropdown-divider"></hr>
+                                    <hr className="dropdown-divider"></hr>
                                     <li 
                                         id="Numerical_Differentiation"
-                                        class="dropdown-item"
+                                        className="dropdown-item"
                                         name="Numerical_Differentiation"
                                         onClick={this.CheckChapter}
                                     >
