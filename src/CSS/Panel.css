@@ -10,6 +10,20 @@
   /* display: block; */
 }
 
+.DisplayFlex {
+  display: flex;
+  flex-direction: row;
+  padding: 50px;
+}
+
+.matrixA {
+  margin-right: 20px;
+}
+
+.matrixB {
+  margin-left: 20px;
+}
+
 .header {
   border: 2px solid black;
   width: 700px;
@@ -117,4 +131,15 @@ h3 {
 
 .container:hover .flap::before{
   transform: translatex(-300px);
+}
+
+.input_matrix {
+  width: 100px;
+}
+
+.input_size {
+  width: 50px;
+}
+label {
+  /* background-color: gray; */
 }

@@ -15,8 +15,7 @@ import {
 } from "recharts";
 
 import { MathJax, MathJaxContext } from "better-react-mathjax";
-import { e, thomsonCrossSectionDependencies } from "mathjs";
-import { compileString } from "sass";
+import { thomsonCrossSectionDependencies } from "mathjs";
 
 class Home extends React.Component {
     constructor(props) {
@@ -29,7 +28,7 @@ class Home extends React.Component {
                         <div>Username</div>
                         <input className="Input-Login" id="UserName" type="text" name="UserName" onChange={this.handleChange}></input>
                         <div>Password</div>
-                        <input className="Input-Login" id="Password" type="text" name="Password" onChange={this.handleChange}></input>
+                        <input className="Input-Login" id="Password" type="password" name="Password" onChange={this.handleChange}></input>
                         <br></br>
                         <input type="submit" value="Submit"/>
                     </form>
@@ -86,7 +85,7 @@ class Home extends React.Component {
             h: 0,
         };
     }
-
+    DisplayPleaseLogin = [];
     Convert_Latex = (eq) => {
         try {
             return (
@@ -107,7 +106,6 @@ class Home extends React.Component {
     Create_Graph = () => {
         return (
             <LineChart
-                className="center"
                 width={800}
                 height={400}
                 data={this.state.Array_Answer}
@@ -182,7 +180,6 @@ class Home extends React.Component {
     CheckEveryInput = true;
 
     GetDataFromManualInput = () => {
-        console.log(this.state.metA, this.state.metB, this.state.metX);
         this.CheckEveryInput = true;
         if (this.GetInputMatrix === true) {
             if(this.state.Chapter === "Lagrange_Interpolation")
@@ -240,6 +237,7 @@ class Home extends React.Component {
                 try {
                     for (let i = 0; i < this.state.row; i++) {
                         for (let j = 0; j < this.state.column; j++) {
+                            console.log(document.getElementById("B"+j.toString()).value);
                             if (
                                 document.getElementById(i.toString() + j.toString())
                                     .value === "" ||
@@ -257,15 +255,11 @@ class Home extends React.Component {
                                 )
                             );
                         }
-                        if (document.getElementById(i.toString()).value === "") {
-                            break;
-                        } else {
-                            GetMatrixBFromTable.push(
-                                JSON.parse(
-                                    document.getElementById("B"+i.toString()).value
-                                )
-                            );
-                        }
+                        GetMatrixBFromTable.push(
+                            JSON.parse(
+                                document.getElementById("B"+i.toString()).value
+                            )
+                        );
                     }
                     var GetMatrixAFromTable = [];
                     while (TempMatrixA.length)
@@ -716,6 +710,7 @@ class Home extends React.Component {
                     Chapter: "Jacobi_Iteration",
                     metA: [],
                     metB: [],
+                    metX: [],
                     row: 0,
                     column: 0,
                     Matrix_Answer: [],
@@ -728,6 +723,7 @@ class Home extends React.Component {
                     Chapter: "Gauss_Seidel_Iteration",
                     metA: [],
                     metB: [],
+                    metX: [],
                     row: 0,
                     column: 0,
                     Matrix_Answer: [],
@@ -740,6 +736,7 @@ class Home extends React.Component {
                     Chapter: "Conjugate_Gradient",
                     metA: [],
                     metB: [],
+                    metX: [],
                     row: 0,
                     column: 0,
                     loading: true,
@@ -886,6 +883,7 @@ class Home extends React.Component {
                 console.log("default");
         }
     };
+
     //*** Part Calculation ***//
     Cal_Error = (Xold, Xnew) => {
         return Math.abs((Xnew - Xold) / Xnew);
@@ -982,163 +980,252 @@ class Home extends React.Component {
         // var Answer_Show_Table = [];
         switch (this.state.Chapter) {
             case "Bisection":
-                this.Answer = (L + R) / 2;
-                YR = this.Convert_Eq(this.state.equation, R);
-                YM = this.Convert_Eq(this.state.equation, this.Answer);
-
-                while (total > this.state.Criterion) {
+                try {
                     this.Answer = (L + R) / 2;
                     YR = this.Convert_Eq(this.state.equation, R);
                     YM = this.Convert_Eq(this.state.equation, this.Answer);
-                    if (YM * YR < 0) {
-                        total = this.Cal_Error(this.Answer, L);
-                        L = this.Answer;
-                    } else {
-                        total = this.Cal_Error(this.Answer, R);
-                        R = this.Answer;
+    
+                    while (total > this.state.Criterion) {
+                        this.Answer = (L + R) / 2;
+                        YR = this.Convert_Eq(this.state.equation, R);
+                        YM = this.Convert_Eq(this.state.equation, this.Answer);
+                        if (YM * YR < 0) {
+                            total = this.Cal_Error(this.Answer, L);
+                            L = this.Answer;
+                        } else {
+                            total = this.Cal_Error(this.Answer, R);
+                            R = this.Answer;
+                        }
                     }
-                }
-                // Push Boundary & Answer of Equation
-                for (let i = -20; i <= 20; i++) {
-                    if (this.Answer > i - 1 && this.Answer < i) {
-                        // Final_Answer.push({
-                        //     Graph: this.Convert_Eq(this.state.equation, this.state.left),
-                        //     X: this.state.left,
-                        // });
+                    // Push Boundary & Answer of Equation
+                    for (let i = -20; i <= 20; i++) {
+                        if (this.Answer > i - 1 && this.Answer < i) {
+                            // Final_Answer.push({
+                            //     Graph: this.Convert_Eq(this.state.equation, this.state.left),
+                            //     X: this.state.left,
+                            // });
+                            Final_Answer.push({
+                                Graph: this.Convert_Eq(
+                                    this.state.equation,
+                                    this.Answer
+                                ),
+                                X: this.Answer,
+                            });
+                            // Final_Answer.push({
+                            //     Graph: this.Convert_Eq(this.state.equation, this.state.right),
+                            //     X: this.state.right,
+                            // });
+                        }
                         Final_Answer.push({
-                            Graph: this.Convert_Eq(
-                                this.state.equation,
-                                this.Answer
-                            ),
-                            X: this.Answer,
+                            Graph: this.Convert_Eq(this.state.equation, i),
+                            X: i,
                         });
-                        // Final_Answer.push({
-                        //     Graph: this.Convert_Eq(this.state.equation, this.state.right),
-                        //     X: this.state.right,
-                        // });
                     }
-                    Final_Answer.push({
-                        Graph: this.Convert_Eq(this.state.equation, i),
-                        X: i,
+                    this.setState({
+                        ProveAnswer: (
+                            <div>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        <h3>Prove Answer</h3>
+                                        <h4>
+                                            Equation: {this.Convert_Latex(this.state.equation)}
+                                        </h4>
+                                        <h4>Replace x with {this.Convert_Latex(this.Answer)}</h4>
+                                        <h4>
+                                            {this.state.equation.replace(/x/g,this.Answer)+"="
+                                            +this.Convert_Eq(this.state.equation, this.Answer)}
+                                        </h4>
+                                    </MathJax>
+                                </MathJaxContext>
+                            </div>
+                            ),
+                        Array_Answer: Final_Answer,
+                        Actual_Answer: this.Answer
                     });
                 }
-                // console.log(this.Answer.toFixed2));
-                this.setState({
-                    ProveAnswer: (
-                        <div>
-                            <h1>
-                                Equation: {(this.state.equation)}
-                            </h1>
-                            <h1>Replace x with {this.Answer}</h1>
-                            <h1>
-                                {this.state.equation.replace(/x/g,this.Answer)+"="
-                                +this.Convert_Eq(this.state.equation, this.Answer)}
-                            </h1>
-                        </div>
-                        ),
-                    Array_Answer: Final_Answer,
-                    Actual_Answer: this.Answer
-                });
-                // this.generateAnswerTable(Answer_Show_Table);
-
+                catch(e) {}
                 break;
 
             case "False_Position":
-                while (total > this.state.Criterion) {
-                    this.Answer =
-                        (L * this.Convert_Eq(this.state.equation, R) -
-                            R * this.Convert_Eq(this.state.equation, L)) /
-                        (this.Convert_Eq(this.state.equation, R) -
-                            this.Convert_Eq(this.state.equation, L));
-                    YR = this.Convert_Eq(this.state.equation, R);
-                    var YX = this.Convert_Eq(this.state.equation, this.Answer);
-
-                    if (YX * YR < 0) {
-                        total = this.Cal_Error(L, this.Answer);
-                        L = this.Answer;
-                    } else {
-                        total = this.Cal_Error(R, this.Answer);
-                        R = this.Answer;
+                try{
+                    while (total > this.state.Criterion) {
+                        this.Answer =
+                            (L * this.Convert_Eq(this.state.equation, R) -
+                                R * this.Convert_Eq(this.state.equation, L)) /
+                            (this.Convert_Eq(this.state.equation, R) -
+                                this.Convert_Eq(this.state.equation, L));
+                        YR = this.Convert_Eq(this.state.equation, R);
+                        var YX = this.Convert_Eq(this.state.equation, this.Answer);
+    
+                        if (YX * YR < 0) {
+                            total = this.Cal_Error(L, this.Answer);
+                            L = this.Answer;
+                        } else {
+                            total = this.Cal_Error(R, this.Answer);
+                            R = this.Answer;
+                        }
+                        count++;
                     }
-                    count++;
-                }
-                for (let i = -150; i <= 150; i++) {
-                    Final_Answer.push({
-                        Graph: this.Convert_Eq(this.state.equation, i),
-                        // Y: i,
-                        X: i,
+                    for (let i = -150; i <= 150; i++) {
+                        if (this.Answer > i - 1 && this.Answer < i) {
+                            Final_Answer.push({
+                                Graph: this.Convert_Eq(
+                                    this.state.equation,
+                                    this.Answer
+                                ),
+                                X: this.Answer,
+                            });
+                        }
+                        Final_Answer.push({
+                            Graph: this.Convert_Eq(this.state.equation, i),
+                            // Y: i,
+                            X: i,
+                        });
+                    }   
+                    this.setState({
+                        ProveAnswer: (
+                            <div>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        <h3>Prove Answer</h3>
+                                        <h4>
+                                            Equation: {this.Convert_Latex(this.state.equation)}
+                                        </h4>
+                                        <h4>Replace x with {this.Convert_Latex(this.Answer)}</h4>
+                                        <h4>
+                                            {this.state.equation.replace(/x/g,this.Answer)+"="
+                                            +this.Convert_Eq(this.state.equation, this.Answer)}
+                                        </h4>
+                                    </MathJax>
+                                </MathJaxContext>
+                            </div>
+                            ),
+                        Array_Answer: Final_Answer,
+                        Actual_Answer: this.Answer,
                     });
                 }
-
-                this.setState({
-                    Array_Answer: Final_Answer,
-                    Actual_Answer: this.Answer,
-                });
-
+                catch(e) {};
                 break;
 
             case "One_Point_Iteration":
-                var Xold = JSON.parse(this.state.X0);
-
-                Xnew = 0;
-
-                while (total > this.state.Criterion) {
-                    Xnew = this.Convert_Eq(this.state.equation, Xold);
-                    if (this.Cal_Error(Xold, Xnew) > this.state.Criterion) {
-                        total = this.Cal_Error(Xnew, Xold);
-                        console.log(total);
-                        Xold = Xnew;
-                    } else {
-                        for (let i = -150; i <= 150; i++) {
-                            Final_Answer.push({
-                                Graph: this.Convert_Eq(this.state.equation, i),
-                                X: i,
-                            });
+                try
+                {
+                    var Xold = JSON.parse(this.state.X0);
+                    Xnew = 0;
+                    while (total > this.state.Criterion) {
+                        Xnew = this.Convert_Eq(this.state.equation, Xold);
+                        if (this.Cal_Error(Xold, Xnew) > this.state.Criterion) {
+                            total = this.Cal_Error(Xnew, Xold);
+                            console.log(Xnew);
+                            Xold = Xnew;
+                        } else {
+                            for (let i = -150; i <= 150; i++) {
+                                if (Xnew > i - 1 && Xnew < i) {
+                                    Final_Answer.push({
+                                        Graph: this.Convert_Eq(
+                                            this.state.equation,
+                                            Xnew
+                                        ),
+                                        X: Xnew,
+                                    });
+                                }
+                                Final_Answer.push({
+                                    Graph: this.Convert_Eq(this.state.equation, i),
+                                    X: i,
+                                });
+                            }
+                           
+                            break;
                         }
-                        this.setState({
-                            Array_Answer: Final_Answer,
-                            Actual_Answer: this.Answer,
-                        });
-                        this.Answer = Xold;
-                        break;
                     }
+                    var Final_Equation = this.state.equation+("-x");
+                    this.setState({
+                        ProveAnswer: (
+                            <div>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        <h3>Prove Answer</h3>
+                                        <h4>
+                                            Equation: {this.Convert_Latex(Final_Equation)}
+                                        </h4>
+                                        <h4>Replace x with {this.Convert_Latex(Xnew)}</h4>
+                                        <h4>
+                                            {Final_Equation.replace(/x/g,Xnew)+"="
+                                            +this.Convert_Eq(Final_Equation, Xnew)}
+                                        </h4>
+                                    </MathJax>
+                                </MathJaxContext>
+                            </div>
+                            ),
+                        Array_Answer: Final_Answer,
+                        Actual_Answer: Xnew,
+                    });
                 }
-
+                catch(e) {}
                 break;
 
             case "Newton_Raphson":
-                Xold = JSON.parse(this.state.X0);
-                while (total > this.state.Criterion) {
-                    let deltaX =
-                        -1 *
-                        (this.Convert_Eq(this.state.equation, Xold) /
-                            Math.derivative(this.state.equation, "x").evaluate({
-                                x: Xold,
-                            }));
-
-                    let Xnew = Xold + deltaX;
-
-                    if (this.Cal_Error(Xnew, Xold) > this.state.Criterion) {
-                        total = this.Cal_Error(Xnew, Xold);
-                        Xold = Xnew;
-                    } else {
-                        break;
+                try {
+                    Xold = JSON.parse(this.state.X0);
+                    while (total > this.state.Criterion) {
+                        let deltaX =
+                            -1 *
+                            (this.Convert_Eq(this.state.equation, Xold) /
+                                Math.derivative(this.state.equation, "x").evaluate({
+                                    x: Xold,
+                                }));
+    
+                        let Xnew = Xold + deltaX;
+    
+                        if (this.Cal_Error(Xnew, Xold) > this.state.Criterion) {
+                            total = this.Cal_Error(Xnew, Xold);
+                            Xold = Xnew;
+                        } else {
+                            break;
+                        }
+                        this.Answer = Xnew;
                     }
-                    this.Answer = Xnew;
-                }
-
-                for (let i = -150; i <= 150; i++) {
-                    Final_Answer.push({
-                        Graph: this.Convert_Eq(this.state.equation, i),
-                        // Y: i,
-                        X: i,
+    
+                    for (let i = -150; i <= 150; i++) {
+                        if (this.Answer > i - 1 && this.Answer < i) {
+                            Final_Answer.push({
+                                Graph: this.Convert_Eq(
+                                    this.state.equation,
+                                    this.Answer
+                                ),
+                                X: this.Answer,
+                            });
+                        }
+                        Final_Answer.push({
+                            Graph: this.Convert_Eq(this.state.equation, i),
+                            // Y: i,
+                            X: i,
+                        });
+                    }
+    
+                    this.setState({
+                        ProveAnswer: (
+                            <div>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        <h3>Prove Answer</h3>
+                                        <h4>
+                                            Equation: {this.Convert_Latex(this.state.equation)}
+                                        </h4>
+                                        <h4>Replace x with {this.Convert_Latex(this.Answer)}</h4>
+                                        <h4>
+                                            {this.state.equation.replace(/x/g,this.Answer)+"="
+                                            +this.Convert_Eq(this.state.equation, this.Answer)}
+                                        </h4>
+                                    </MathJax>
+                                </MathJaxContext>
+                            </div>
+                            ),
+                        Array_Answer: Final_Answer,
+                        Actual_Answer: this.Answer
                     });
                 }
-
-                this.setState({
-                    Array_Answer: Final_Answer,
-                    Actual_Answer: this.Answer
-                });
+                catch(e) {}
                 break;
 
             case "Secant_Method":
@@ -2335,7 +2422,8 @@ class Home extends React.Component {
             var Input_Table = [];
             for (let i = 0; i < column; i++) {
                 Input_Table.push(
-                    <input
+                    <input 
+                        className="input_matrix" 
                         id={row.toString() + i.toString()}
                         // key={row.toString() + i.toString()}
                     ></input>
@@ -2373,7 +2461,7 @@ class Home extends React.Component {
                 for (let i = 0; i < row; i++) {
                     Matrix_Table.push(
                         <tr>
-                            <input id={name+i.toString()} key={name+i.toString()}></input>
+                            <input className="input_matrix" id={name+i.toString()} key={name+i.toString()}></input>
                         </tr>
                     );
                     // console.log(i.toString());
@@ -2381,20 +2469,6 @@ class Home extends React.Component {
             }
             return Matrix_Table;
         } catch {}
-    };
-
-    // Generate Answer Table
-    generateAnswerTable = (Answer) => {
-        var Table = [];
-        console.log(Answer.L);
-        // while (Answer.length)
-        //     Table.push(
-        //         <tr>
-        //             <td>{Answer.L}</td>
-        //             <td>{Answer.R}</td>
-        //             <td>{Answer.M}</td>
-        //         </tr>
-        //     );
     };
 
     // Manual Input Matric Chapter 2
@@ -2412,6 +2486,7 @@ class Home extends React.Component {
                         <label>
                             Row:
                             <input
+                                className="input_size" 
                                 id="row_Cramer"
                                 type="number"
                                 name="row"
@@ -2420,42 +2495,59 @@ class Home extends React.Component {
                             ></input>
                             Column:
                             <input
+                                className="input_size" 
                                 id="row_Cramer"
                                 type="number"
                                 name="column"
                                 value={this.state.column}
                                 onChange={this.handleChange}
                             />
-                            <br />
-                            Input MatrixA:
-                            <table>
-                                {this.generateMatrixATable(
-                                    this.state.row,
-                                    this.state.column
-                                )}
-                            </table>
-                            <br />
-                            Input MatrixB:
-                            <table>
-                                {this.generateMatrixBTable(
-                                    this.state.row,
-                                    this.state.column,
-                                    "B"
-                                )}
-                            </table>
-                        </label>
-                        <input type="submit" value="Submit" />
-                        <h1>
+                            <div className="DisplayFlex">
+                                <div className="matrixA">
+                                    Input MatrixA:
+                                    <table>
+                                        {this.generateMatrixATable(
+                                            this.state.row,
+                                            this.state.column
+                                        )}
+                                    </table>
+                                </div>
+                                <div className="matrixB">
+                                    Input MatrixB:
+                                    <table>
+                                        {this.generateMatrixBTable(
+                                            this.state.row,
+                                            this.state.column,
+                                            "B"
+                                        )}
+                                    </table>
+                                </div>
+                            </div>
+                            <h3>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        <div className="DisplayFlex">
+                                            <div className="matrixA">
+                                            MatrixA : {this.Convert_Latex(this.state.metA)}
+                                            </div>
+                                            <div className="matrixB">
+                                            MatrixB : {this.Convert_Latex(this.state.metB)}
+                                            </div>
+                                        </div>
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h3>
+                            <input type="submit" value="Submit" />
+                            <br/>
+                            <hr/>
+                            <h3>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    MatrixA : {this.Convert_Latex(this.state.metA)}
-                                    <br></br>
-                                    MatrixB : {this.Convert_Latex(this.state.metB)}
-                                    <br></br>
+                                    Answer : {this.state.Matrix_Answer}
                                 </MathJax>
                             </MathJaxContext>
-                        </h1>
-                        Answer : {this.state.Matrix_Answer}
+                            </h3>
+                        </label>
                     </form>
                 );
                 return HTML;
@@ -2464,7 +2556,7 @@ class Home extends React.Component {
                 HTML = [];
                 this.GetInputMatrix = false;
                 HTML.push(
-                    <div>
+                    <label>
                         <form onSubmit={this.handleSubmit}>
                             <select
                                 onChange={this.getEquationFromAPI}
@@ -2473,22 +2565,32 @@ class Home extends React.Component {
                                 <option value="">Choose Example Equation</option>
                                 {Data}
                             </select>
-                            <input type="submit" value="Submit" />
-                            <h1>
+                            <h3>
                                 <MathJaxContext>
                                     <MathJax dynamic>
-                                        MatrixA :{" "}
-                                        {this.Convert_Latex(this.state.metA)}
-                                        <br></br>
-                                        MatrixB :{" "}
-                                        {this.Convert_Latex(this.state.metB)}
-                                        <br></br>
+                                        <div className="DisplayFlex">
+                                            <div className="matrixA">
+                                            MatrixA : {this.Convert_Latex(this.state.metA)}
+                                            </div>
+                                            <div className="matrixB">
+                                            MatrixB : {this.Convert_Latex(this.state.metB)}
+                                            </div>
+                                        </div>
                                     </MathJax>
                                 </MathJaxContext>
-                            </h1>
-                            Answer : {this.state.Matrix_Answer}
+                            </h3>
+                            <input type="submit" value="Submit" />
+                            <br/>
+                            <hr/>
+                            <h3>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    Answer : {this.state.Matrix_Answer}
+                                </MathJax>
+                            </MathJaxContext>
+                            </h3>
                         </form>
-                    </div>
+                    </label>
                 );
                 return HTML;
             }
@@ -2502,6 +2604,7 @@ class Home extends React.Component {
                         <label>
                             Row:
                             <input
+                                className="input_size" 
                                 id="row_Cramer"
                                 type="number"
                                 name="row"
@@ -2510,6 +2613,7 @@ class Home extends React.Component {
                             ></input>
                             Column:
                             <input
+                                className="input_size" 
                                 id="row_Cramer"
                                 type="number"
                                 name="column"
@@ -2517,44 +2621,65 @@ class Home extends React.Component {
                                 onChange={this.handleChange}
                             />
                             <br />
-                            Input MatrixA:
-                            <table>
-                                {this.generateMatrixATable(
-                                    this.state.row,
-                                    this.state.column
-                                )}
-                            </table>
-                            <br />
-                            Input MatrixB:
-                            <table>
-                                {this.generateMatrixBTable(
-                                    this.state.row,
-                                    this.state.column,
-                                    "B"
-                                )}
-                            </table>
-                            Input MatrixX:
-                            <table>
-                                {this.generateMatrixBTable(
-                                    this.state.row,
-                                    this.state.column,
-                                    "X"
-                                )}
-                            </table>
-                        </label>
-                        <input type="submit" value="Submit" />
-                        <h1>
+                            <div className="DisplayFlex">
+                                <div className="matrixA">
+                                    Input MatrixA:
+                                    <table>
+                                        {this.generateMatrixATable(
+                                            this.state.row,
+                                            this.state.column
+                                        )}
+                                    </table>
+                                </div>
+                                <div className="matrixB">
+                                    Input MatrixB:
+                                    <table>
+                                        {this.generateMatrixBTable(
+                                            this.state.row,
+                                            this.state.column,
+                                            "B"
+                                        )}
+                                    </table>
+                                </div>
+                                <div className="matrixB">
+                                    Input MatrixX:
+                                    <table>
+                                        {this.generateMatrixBTable(
+                                            this.state.row,
+                                            this.state.column,
+                                            "X"
+                                        )}
+                                    </table>
+                                </div>
+                            </div>
+                        <h3>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    MatrixA : {this.Convert_Latex(this.state.metA)}
-                                    <br></br>
-                                    MatrixB : {this.Convert_Latex(this.state.metB)}
-                                    <br></br>
-                                    MatrixX : {this.Convert_Latex(this.state.metX)}
+                                    <div className="DisplayFlex">
+                                        <div className="matrixA">
+                                        MatrixA : {this.Convert_Latex(this.state.metA)}
+                                        </div>
+                                        <div className="matrixB">
+                                        MatrixB : {this.Convert_Latex(this.state.metB)}
+                                        </div>
+                                        <div className="matrixB">
+                                        MatrixX : {this.Convert_Latex(this.state.metX)}
+                                        </div>
+                                    </div>
                                 </MathJax>
                             </MathJaxContext>
-                        </h1>
-                        Answer : {this.state.Matrix_Answer}
+                        </h3>
+                        <input type="submit" value="Submit" />
+                        <br/>
+                        <hr/>
+                        <h3>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    Answer : {this.state.Matrix_Answer}
+                                </MathJax>
+                            </MathJaxContext>
+                        </h3>
+                        </label>
                     </form>
                 );
                 return HTML;
@@ -2563,7 +2688,7 @@ class Home extends React.Component {
                 HTML = [];
                 this.GetInputMatrix = false;
                 HTML.push(
-                    <div>
+                    <label>
                         <form onSubmit={this.handleSubmit}>
                             <select
                                 onChange={this.getEquationFromAPI}
@@ -2572,24 +2697,35 @@ class Home extends React.Component {
                                 <option value="">Choose Example Equation</option>
                                 {Data}
                             </select>
-                            <input type="submit" value="Submit" />
-                            <h1>
+                            <h3>
                                 <MathJaxContext>
                                     <MathJax dynamic>
-                                        MatrixA :{" "}
-                                        {this.Convert_Latex(this.state.metA)}
-                                        <br></br>
-                                        MatrixB :{" "}
-                                        {this.Convert_Latex(this.state.metB)}
-                                        <br></br>
-                                        MatrixX :{" "}
-                                        {this.Convert_Latex(this.state.metX)}
+                                        <div className="DisplayFlex">
+                                            <div className="matrixA">
+                                            MatrixA : {this.Convert_Latex(this.state.metA)}
+                                            </div>
+                                            <div className="matrixB">
+                                            MatrixB : {this.Convert_Latex(this.state.metB)}
+                                            </div>
+                                            <div className="matrixB">
+                                            MatrixX : {this.Convert_Latex(this.state.metX)}
+                                            </div>
+                                        </div>
                                     </MathJax>
                                 </MathJaxContext>
-                            </h1>
-                            Answer : {this.state.Matrix_Answer}
+                            </h3>
+                            <input type="submit" value="Submit" />
+                            <br/>
+                            <hr/>
+                            <h3>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    Answer : {this.state.Matrix_Answer}
+                                </MathJax>
+                            </MathJaxContext>
+                            </h3>
                         </form>
-                    </div>
+                    </label>
                 );
                 return HTML;
             }
@@ -2640,6 +2776,31 @@ class Home extends React.Component {
             }
         } catch (e) {}
     };
+
+    AddDefaultValueToTable = (met, Size) =>
+    {
+        console.log(met);
+        try {
+            if (Size < 2) {
+                this.GetInputMatrix = false;
+            } else if (Size <= 20 && Size > 1 ) {
+                this.GetInputMatrix = true;
+                var Matrix_Table = [];
+                for (let i = 0; i < Size; i++) {
+                    Matrix_Table.push(
+                        <tr>
+                            <input
+                                className="input_matrix"
+                                id={"Y"+i.toString()}
+                                value={met[i]}
+                            ></input>
+                        </tr>
+                    );
+                }
+                return Matrix_Table;
+            }
+        } catch (e) {}
+    }
 
     // Manual Input Matric Chapter 3
     ShowInputChapter3 = (Data) => {
@@ -2707,8 +2868,18 @@ class Home extends React.Component {
                             <option value="">Choose Example Equation</option>
                             {Data}
                         </select>
+                        {/* {this.AddDefaultValueToTable(this.state.metX, JSON.parse(this.state.metX)).length} */}
+                        <br/>
                         <input type="submit" value="Submit" />
-                        Answer : {this.state.Actual_Answer}
+                            <br/>
+                            <hr/>
+                            <h3>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                    Answer : {this.state.Actual_Answer}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h3>
                     </form>
                 </div>
             );
@@ -3281,30 +3452,37 @@ class Home extends React.Component {
         var Data = [];
         var GetData = 0;
         this.Answer = 0;
-        switch (this.state.Chapter) {
-            case "Bisection":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Bisection.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Bisection[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[
-                                GetData.equation,
-                                GetData.left,
-                                GetData.right,
-                            ]}
-                        >
-                            {GetData.equation}
-                        </option>
-                    );
-                }
-                return (
-                    <div className='Panel'>
-                        <h1>Bisection Method</h1>
+        if(this.state.HaveToken === true)
+        {
+            switch (this.state.Chapter) {
+                case "Bisection":
+                    for (
+                        let i = 0;
+                        i < (this.state.DataFromAPI[0].Bisection).length;
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Bisection[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[
+                                    GetData.equation,
+                                    GetData.left,
+                                    GetData.right,
+                                ]}
+                            >
+                                {GetData.equation}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2 >Bisection Method</h2>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                             <select
                                 onChange={this.getEquationFromAPI}
                                 value={[
@@ -3316,957 +3494,1058 @@ class Home extends React.Component {
                                 <option value="">Choose Example Equation</option>
                                     {Data}
                             </select>
-   
-                        <form onSubmit={this.handleSubmit}>
-                            <label className="Input-Equation">
-                                Equation:
-                                <input 
-                                    id="EQ_Bisection"
-                                    type="text"
-                                    name="equation"
-                                    value={this.state.equation}
-                                    onChange={this.handleChange}
-                                ></input>
-                                L:
-                                <input 
-                                    // className="Input"
-                                    id="L_Bisection"
-                                    type="text"
-                                    name="left"
-                                    value={this.state.left}
-                                    onChange={this.handleChange}
-                                />
-                                R:
-                                <input
-                                    // className="Input"
-                                    id="R_Bisection"
-                                    type="text"
-                                    name="right"
-                                    value={this.state.right}
-                                    onChange={this.handleChange}
-                                />
-                            </label>
-                            <input className="button" type="submit" value="Submit" />
-                            <h1>
-                                <MathJaxContext>
-                                    <MathJax dynamic>
-                                        Your Equation :{" "}
-                                        {this.Convert_Latex(
-                                            this.state.equation
-                                        )}{" "}
-                                        <br></br>
-                                        Left Boudary :{" "}
-                                        {this.Convert_Latex(
-                                            this.state.left
-                                        )}{" "}
-                                        <br></br>
-                                        Right Boundary :{" "}
-                                        {this.Convert_Latex(this.state.right)}
-                                    </MathJax>
-                                </MathJaxContext>
-                            </h1>
-                            Answer : {this.state.Actual_Answer}
-                            <div className="center">{this.Create_Graph()}</div>
-                        </form>
-                        <h1>Prove Answer</h1>
-                        {this.state.ProveAnswer}
-                    </div>
-                );
-
-            case "False_Position":
-                for (
-                    let i = 0;
-                    i <
-                    parseInt(this.state.DataFromAPI[0].False_Position.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].False_Position[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[
-                                GetData.equation,
-                                GetData.left,
-                                GetData.right,
-                            ]}
-                        >
-                            {GetData.equation}
-                        </option>
+                            <br/>
+                            <br/>
+                            <form onSubmit={this.handleSubmit}>
+                                <label className="Input-Equation">
+                                    <MathJaxContext>
+                                        <MathJax dynamic>
+                                        Equation:
+                                        <input 
+                                            id="EQ_Bisection"
+                                            type="text"
+                                            name="equation"
+                                            value={this.state.equation}
+                                            onChange={this.handleChange}
+                                        ></input>
+                                        L:
+                                        <input 
+                                            // className="Input"
+                                            id="L_Bisection"
+                                            type="text"
+                                            name="left"
+                                            value={this.state.left}
+                                            onChange={this.handleChange}
+                                        />
+                                        R:
+                                        <input
+                                            // className="Input"
+                                            id="R_Bisection"
+                                            type="text"
+                                            name="right"
+                                            value={this.state.right}
+                                            onChange={this.handleChange}
+                                        />
+                                        <h3>
+                                            <br/>
+                                            Your Equation :{" "}
+                                            {this.Convert_Latex(
+                                                this.state.equation
+                                            )}{" "}
+                                            <br></br>
+                                            Left Boudary :{" "}
+                                            {this.Convert_Latex(
+                                                this.state.left
+                                            )}{" "}
+                                            <br></br>
+                                            Right Boundary :{" "}
+                                            {this.Convert_Latex(this.state.right)}
+                                        </h3>
+                                        <br/>
+                                            <input className="button" type="submit" value="Submit" />
+                                        <hr/>
+                                        <h3>Answer : {this.state.Actual_Answer}</h3>
+                                        </MathJax>
+                                    </MathJaxContext>
+                                    {this.Create_Graph()}
+                                    </label>
+                                </form>
+                            {this.state.ProveAnswer}
+                        </div>
                     );
-                }
-                return (
-                    <div>
-                        <h1>False Position Method</h1>
-                        <select
-                            onChange={this.getEquationFromAPI}
-                            value={[
-                                this.state.equation,
-                                this.state.left,
-                                this.state.right,
-                            ]}
-                        >
-                            <option value="">Choose Example Equation</option>
-                            {Data}
-                        </select>
-                        <form onSubmit={this.handleSubmit}>
-                            <label>
-                                Equation:{""}
-                                <input
-                                    id="EQ_False_Position"
-                                    type="text"
-                                    name="equation"
-                                    value={this.state.equation}
-                                    onChange={this.handleChange}
-                                />
-                                L:{}
-                                <input
-                                    id="L_False_Position"
-                                    type="text"
-                                    name="left"
-                                    value={this.state.left}
-                                    onChange={this.handleChange}
-                                />
-                                R:{}
-                                <input
-                                    id="R_False_Position"
-                                    type="text"
-                                    name="right"
-                                    value={this.state.right}
-                                    onChange={this.handleChange}
-                                />
-                            </label>
-                            <input type="submit" value="Submit" />
-                            <h1>
-                                <MathJaxContext>
-                                    <MathJax dynamic>
-                                        Your Equation :{" "}
-                                        {this.Convert_Latex(
-                                            this.state.equation
-                                        )}{" "}
-                                        <br></br>
-                                        Left Boudary :{" "}
-                                        {this.Convert_Latex(
-                                            this.state.left
-                                        )}{" "}
-                                        <br></br>
-                                        Right Boundary :{" "}
-                                        {this.Convert_Latex(this.state.right)}
-                                    </MathJax>
-                                </MathJaxContext>
-                            </h1>
-                            Answer : {this.state.Actual_Answer}
-                            <div>{this.Create_Graph()}</div>
-                        </form>
-                    </div>
-                );
-
-            case "One_Point_Iteration":
-                for (
-                    let i = 0;
-                    i <
-                    parseInt(
-                        this.state.DataFromAPI[0].One_Point_Iteration.length
-                    );
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].One_Point_Iteration[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.X0]}
-                        >
-                            {GetData.equation}
-                        </option>
-                    );
-                }
-                return (
-                    <div>
-                        <h1>One Point Iteration</h1>
-                        <select
-                            onChange={this.getEquationFromAPI}
-                            value={[this.state.equation, this.state.X0]}
-                        >
-                            <option value="">Choose Example Equation</option>
-                            {Data}
-                        </select>
-                        <form onSubmit={this.handleSubmit}>
-                            <label>
-                                Equation:{""}
-                                <input
-                                    id="EQ_One_Point"
-                                    type="text"
-                                    name="equation"
-                                    value={this.state.equation}
-                                    onChange={this.handleChange}
-                                />
-                                X0:{}
-                                <input
-                                    id="X_One_Point"
-                                    type="text"
-                                    name="X0"
-                                    value={this.state.X0}
-                                    onChange={this.handleChange}
-                                />
-                            </label>
-                            <input type="submit" value="Submit" />
-                            <h1>
-                                {this.state.equation}, {this.state.X0}
-                                <MathJaxContext>
-                                    <MathJax dynamic>
-                                        Your Equation :{" "}
-                                        {this.Convert_Latex(
-                                            this.state.equation
-                                        )}{" "}
-                                        <br></br>
-                                        Inital X :{" "}
-                                        {this.Convert_Latex(this.state.X0)}
-                                    </MathJax>
-                                </MathJaxContext>
-                            </h1>
-                            Answer : {this.state.Actual_Answer}
-                            <div>{this.Create_Graph()}</div>
-                        </form>
-                    </div>
-                );
-
-            case "Newton_Raphson":
-                for (
-                    let i = 0;
-                    i <
-                    parseInt(this.state.DataFromAPI[0].Newton_Raphson.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Newton_Raphson[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.X0]}
-                        >
-                            {GetData.equation}
-                        </option>
-                    );
-                }
-                return (
-                    <div>
-                        <h1>Newton Raphson</h1>
-                        <select
-                            onChange={this.getEquationFromAPI}
-                            value={[this.state.equation, this.state.X0]}
-                        >
-                            <option value="">Choose Example Equation</option>
-                            {Data}
-                        </select>
-                        <form onSubmit={this.handleSubmit}>
-                            <label>
-                                Equation:{""}
-                                <input
-                                    id="EQ_Newton"
-                                    type="text"
-                                    name="equation"
-                                    value={this.state.equation}
-                                    onChange={this.handleChange}
-                                />
-                                X0:{}
-                                <input
-                                    id="X0_Newton"
-                                    type="text"
-                                    name="X0"
-                                    value={this.state.X0}
-                                    onChange={this.handleChange}
-                                />
-                            </label>
-                            <input type="submit" value="Submit" />
-                            <h1>
-                                <MathJaxContext>
-                                    <MathJax dynamic>
-                                        Your Equation :{" "}
-                                        {this.Convert_Latex(
-                                            this.state.equation
-                                        )}{" "}
-                                        <br></br>
-                                        Inital X :{" "}
-                                        {this.Convert_Latex(this.state.X0)}
-                                    </MathJax>
-                                </MathJaxContext>
-                            </h1>
-                            Answer : {this.state.Actual_Answer}
-                            <div>{this.Create_Graph()}</div>
-                        </form>
-                    </div>
-                );
-
-            case "Secant_Method":
-                for (
-                    let i = 0;
-                    i <
-                    parseInt(this.state.DataFromAPI[0].Secant_Method.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Secant_Method[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.X0, GetData.X1]}
-                        >
-                            {GetData.equation}
-                        </option>
-                    );
-                }
-                return (
-                    <div>
-                        <h1>Secant Method</h1>
-                        <select
-                            onChange={this.getEquationFromAPI}
-                            value={[
-                                this.state.equation,
-                                this.state.X0,
-                                this.state.X1,
-                            ]}
-                        >
-                            <option value="">Choose Example Equation</option>
-                            {Data}
-                        </select>
-                        <form onSubmit={this.handleSubmit}>
-                            <label>
-                                Equation:{""}
-                                <input
-                                    id="EQ_Secant"
-                                    type="text"
-                                    name="equation"
-                                    value={this.state.equation}
-                                    onChange={this.handleChange}
-                                />
-                                X0:{}
-                                <input
-                                    id="X0_Secant"
-                                    type="text"
-                                    name="X0"
-                                    value={this.state.X0}
-                                    onChange={this.handleChange}
-                                />
-                                X1:{}
-                                <input
-                                    id="X1_Secant"
-                                    type="text"
-                                    name="X1"
-                                    value={this.state.X1}
-                                    onChange={this.handleChange}
-                                />
-                            </label>
-                            <input type="submit" value="Submit" />
-                            <h1>
-                                <MathJaxContext>
-                                    <MathJax dynamic>
-                                        Your Equation :{" "}
-                                        {this.Convert_Latex(
-                                            this.state.equation
-                                        )}{" "}
-                                        <br></br>
-                                        Inital X0 :{" "}
-                                        {this.Convert_Latex(this.state.X0)}
-                                        <br></br>
-                                        Inital X1 :{" "}
-                                        {this.Convert_Latex(this.state.X1)}
-                                    </MathJax>
-                                </MathJaxContext>
-                            </h1>
-                            Answer : {this.state.Actual_Answer}
-                            <div>{this.Create_Graph()}</div>
-                        </form>
-                    </div>
-                );
-
-            case "Cramer_Rule":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Cramer_Rule.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Cramer_Rule[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.metrixA, GetData.metrixB]}
-                        >
-                            {GetData.id}
-                        </option>
-                    );
-                }
-                return (
-                    <div>
-                        <h1>Cramer's Rule</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter2(Data)}
-                    </div>
-                );
-
-            case "Gauss_Elimination":
-                for (
-                    let i = 0;
-                    i <
-                    parseInt(
-                        this.state.DataFromAPI[0].Gauss_Elimination.length
-                    );
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Gauss_Elimination[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.metrixA, GetData.metrixB]}
-                        >
-                            {GetData.id}
-                        </option>
-                    );
-                }
-                return (
-                    <div>
-                        <h1>Gauss Elimination Method</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter2(Data)}
-                    </div>
-                );
-
-            case "Gauss_Jordan":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Gauss_Jordan.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Gauss_Jordan[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.metrixA, GetData.metrixB]}
-                        >
-                            {GetData.id}
-                        </option>
-                    );
-                }
-                return (
-                    <div>
-                        <h1>Gauss Jordan</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter2(Data)}
-                    </div>
-                );
-
-            case "LU_Decompost":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].LU_Decompost.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].LU_Decompost[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.metrixA, GetData.metrixB]}
-                        >
-                            {GetData.id}
-                        </option>
-                    );
-                }
-                return (
-                    <div>
-                        <h1>LU Decompost</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter2(Data)}
-                    </div>
-                );
-
-            case "Jacobi_Iteration":
-                for (
-                    let i = 0;
-                    i <
-                    parseInt(this.state.DataFromAPI[0].Jacobi_Iteration.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Jacobi_Iteration[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[
-                                GetData.metrixA,
-                                GetData.metrixB,
-                                GetData.metrixX
-                            ]}
-                        >
-                            {GetData.id}
-                        </option>
-                    );
-                }
-                return (
-                    <div>
-                        <h1>Jacobi Iteration</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter2(Data)}
-                    </div>
-                );
-
-            case "Gauss_Seidel_Iteration":
-                for (
-                    let i = 0;
-                    i <
-                    parseInt(
-                        this.state.DataFromAPI[0].Gauss_Seidel_Iteration.length
-                    );
-                    i++
-                ) {
-                    GetData =
-                        this.state.DataFromAPI[0].Gauss_Seidel_Iteration[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[
-                                GetData.metrixA,
-                                GetData.metrixB,
-                                GetData.metrixX
-                            ]}
-                        >
-                            {GetData.id}
-                        </option>
-                    );
-                }
-                return (
-                    <div>
-                        <h1>Gauss Seidel Iteration</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter2(Data)}
-                    </div>
-                );
-
-            case "Conjugate_Gradient":
-                for (
-                    let i = 0;
-                    i <
-                    parseInt(
-                        this.state.DataFromAPI[0].Conjugate_Gradient.length
-                    );
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Conjugate_Gradient[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[
-                                GetData.metrixA,
-                                GetData.metrixB,
-                                GetData.metrixX
-                            ]}
-                        >
-                            {GetData.id}
-                        </option>
-                    );
-                }
-                return (
-                    <div>
-                        <h1>Conjugate Gradient</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter2(Data)}
-                    </div>
-                );
-
-            case "Newton's_divided-differences":
-                return (
-                    <div>
-                        <h1>Newton's divided-differences</h1>
-                        <form onSubmit={this.handleSubmit}>
-                            <label>
-                                X :{""}
-                                <input
-                                    id="metA_Newtondivided"
-                                    type="text"
-                                    name="metA"
-                                    onChange={this.handleChange}
-                                />
-                                Y:{}
-                                <input
-                                    id="metB_Newtondivided"
-                                    type="text"
-                                    name="metB"
-                                    onChange={this.handleChange}
-                                />
-                                Scope:{}
-                                <input
-                                    id="metX_Newtondivided"
-                                    type="text"
-                                    name="metX"
-                                    onChange={this.handleChange}
-                                />
-                                X_:
-                                {
-                                    <input
-                                        id="X_Newtondivided"
-                                        type="text"
-                                        name="X"
-                                        onChange={this.handleChange}
-                                    />
-                                }
-                            </label>
-                            <input type="submit" value="Submit" />
+    
+                case "False_Position":
+                    for (
+                        let i = 0;
+                        i <
+                        parseInt(this.state.DataFromAPI[0].False_Position.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].False_Position[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[
+                                    GetData.equation,
+                                    GetData.left,
+                                    GetData.right,
+                                ]}
+                            >
+                                {GetData.equation}
+                            </option>
+                        );
+                    }
+                
+                    return (
+                        <div>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    MatrixA :{" "}
-                                    {this.Convert_Latex(this.state.metA)}
-                                    <br></br>
-                                    MatrixB :{" "}
-                                    {this.Convert_Latex(this.state.metB)}
+                                    <h2>False Position Method</h2>
+                                    <br/>
                                 </MathJax>
                             </MathJaxContext>
-                            <h1 id="Newton's divided-differences" />{" "}
-                            {/* <div>{this.Create_Graph()}</div> */}
-                        </form>
-                    </div>
-                );
-
-            case "Lagrange_Interpolation":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Lagrange_Interpolation.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Lagrange_Interpolation[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.metrixX, GetData.metrixY, GetData.Scope, GetData.X]}
-                        >
-                            {GetData.id}
-                        </option>
+                            <select
+                                onChange={this.getEquationFromAPI}
+                                value={[
+                                    this.state.equation,
+                                    this.state.left,
+                                    this.state.right,
+                                ]}
+                            >
+                                <option value="">Choose Example Equation</option>
+                                {Data}
+                            </select>
+                            <br/>
+                            <br/>
+                            <form onSubmit={this.handleSubmit}>
+                                <label>
+                                    <MathJaxContext>
+                                        <MathJax dynamic>
+                                            Equation:{""}
+                                            <input
+                                                id="EQ_False_Position"
+                                                type="text"
+                                                name="equation"
+                                                value={this.state.equation}
+                                                onChange={this.handleChange}
+                                            />
+                                            L:{}
+                                            <input
+                                                id="L_False_Position"
+                                                type="text"
+                                                name="left"
+                                                value={this.state.left}
+                                                onChange={this.handleChange}
+                                            />
+                                            R:{}
+                                            <input
+                                                id="R_False_Position"
+                                                type="text"
+                                                name="right"
+                                                value={this.state.right}
+                                                onChange={this.handleChange}
+                                            />
+                                            <br/> 
+                                            <h3>
+                                                <br/>
+                                                Your Equation :
+                                                {this.Convert_Latex(
+                                                    this.state.equation
+                                                )}
+                                                <br/> 
+                                                Left Boudary :
+                                                {this.Convert_Latex(
+                                                    this.state.left
+                                                )}
+                                                <br/> 
+                                                Right Boundary :
+                                                {this.Convert_Latex(this.state.right)}
+                                                <br/> 
+                                            </h3>
+                                            <input type="submit" value="Submit" />
+                                        </MathJax>
+                                    </MathJaxContext>
+                                    <br/>
+                                    <hr/>
+                                    <h3>Answer : {this.state.Actual_Answer}</h3>
+                                    {this.Create_Graph()}
+                                </label>
+                            </form>
+                            {this.state.ProveAnswer}
+                        </div>
                     );
-                }
-                return (
-                    <div>
-                        <h1>Lagrange Interpolation</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter3(Data)}
-                    </div>
-                );
-            
-            case "Linear_Regression":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Linear_Regression.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Linear_Regression[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.metrixX, GetData.metrixY, GetData.X]}
-                        >
-                            {GetData.id}
-                        </option>
+    
+                case "One_Point_Iteration":
+                    for (
+                        let i = 0;
+                        i <
+                        parseInt(
+                            this.state.DataFromAPI[0].One_Point_Iteration.length
+                        );
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].One_Point_Iteration[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.X0]}
+                            >
+                                {GetData.equation}
+                            </option>
+                        );
+                    }
+                    
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>One Point Iteration</h2>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <select
+                                onChange={this.getEquationFromAPI}
+                                value={[this.state.equation, this.state.X0]}
+                            >
+                                <option value="">Choose Example Equation</option>
+                                {Data}
+                            </select>
+                            <br/>
+                            <br/>
+                            <form onSubmit={this.handleSubmit}>
+                                <label>
+                                    <MathJaxContext>
+                                        <MathJax dynamic>
+                                            Equation:
+                                            <input
+                                                id="EQ_One_Point"
+                                                type="text"
+                                                name="equation"
+                                                value={this.state.equation}
+                                                onChange={this.handleChange}
+                                            />
+                                            X0:
+                                            <input
+                                                id="X_One_Point"
+                                                type="text"
+                                                name="X0"
+                                                value={this.state.X0}
+                                                onChange={this.handleChange}
+                                            />
+                                        <h3>
+                                            <br/>
+                                            Your Equation :
+                                            {this.Convert_Latex(this.state.equation)}
+                                            <br/>
+                                            Inital X :
+                                            {this.Convert_Latex(this.state.X0)}    
+                                        </h3>
+                                        <br/>
+                                            <input className="button" type="submit" value="Submit" />
+                                        <hr/>
+                                        <h3>Answer : {this.state.Actual_Answer}</h3>
+                                        </MathJax>
+                                    </MathJaxContext>
+                                    <div>{this.Create_Graph()}</div>
+                                </label>
+                            </form>
+                            {this.state.ProveAnswer}
+                        </div>
                     );
-                }
-                return (
-                    <div>
-                        <h1>Linear Regression</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter4(Data)}
-                    </div>
-                );
-
-            case "Polynomial_Regression":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Polynomial_Regression.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Polynomial_Regression[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.metrixX, GetData.metrixY, GetData.X]}
-                        >
-                            {GetData.id}
-                        </option>
+    
+                case "Newton_Raphson":
+                    for (
+                        let i = 0;
+                        i <
+                        parseInt(this.state.DataFromAPI[0].Newton_Raphson.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Newton_Raphson[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.X0]}
+                            >
+                                {GetData.equation}
+                            </option>
+                        );
+                    }
+                   
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>Newton Raphson</h2>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <select
+                                onChange={this.getEquationFromAPI}
+                                value={[this.state.equation, this.state.X0]}
+                            >
+                                <option value="">Choose Example Equation</option>
+                                {Data}
+                            </select>
+                            <br/>
+                            <br/>
+                            <form onSubmit={this.handleSubmit}>
+                                <label>
+                                    <MathJaxContext>
+                                        <MathJax dynamic>
+                                            Equation:{""}
+                                            <input
+                                                id="EQ_Newton"
+                                                type="text"
+                                                name="equation"
+                                                value={this.state.equation}
+                                                onChange={this.handleChange}
+                                            />
+                                            X0:{}
+                                            <input
+                                                id="X0_Newton"
+                                                type="text"
+                                                name="X0"
+                                                value={this.state.X0}
+                                                onChange={this.handleChange}
+                                            />
+                                            <h3>
+                                                <br/>
+                                                Your Equation :
+                                                {this.Convert_Latex(this.state.equation)};
+                                                <br/>
+                                                Inital X :
+                                                {this.Convert_Latex(this.state.X0)}
+                                            </h3>
+                                            <br/>
+                                                <input className="button" type="submit" value="Submit" />
+                                            <hr/> 
+                                            <h3>Answer : {this.state.Actual_Answer}</h3>
+                                        </MathJax>
+                                    </MathJaxContext>
+                                <div>{this.Create_Graph()}</div>
+                                </label>
+                            </form>
+                            {this.state.ProveAnswer}
+                        </div>
                     );
-                }
-                return (
-                    <div>
-                        <h1>Polynomial Regression</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter4(Data)}
-                    </div>
-                );
-            
-            case "Multiple_Linear_Regression":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Multiple_Linear_Regression.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Multiple_Linear_Regression[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.metrix1, GetData.metrix2, GetData.metrix3, 
-                                    GetData.metrixY, GetData.X1, GetData.X2, GetData.X3]}
-                        >
-                            {GetData.id}
-                        </option>
+    
+                case "Secant_Method":
+                    for (
+                        let i = 0;
+                        i <
+                        parseInt(this.state.DataFromAPI[0].Secant_Method.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Secant_Method[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.X0, GetData.X1]}
+                            >
+                                {GetData.equation}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>Secant Method</h2>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <select
+                                onChange={this.getEquationFromAPI}
+                                value={[
+                                    this.state.equation,
+                                    this.state.X0,
+                                    this.state.X1,
+                                ]}
+                            >
+                                <option value="">Choose Example Equation</option>
+                                {Data}
+                            </select>
+                            <br/>
+                            <br/>
+                            <form onSubmit={this.handleSubmit}>
+                                <label>
+                                    <MathJaxContext>
+                                        <MathJax dynamic>
+                                            Equation:{""}
+                                            <input
+                                                id="EQ_Secant"
+                                                type="text"
+                                                name="equation"
+                                                value={this.state.equation}
+                                                onChange={this.handleChange}
+                                            />
+                                            X0:{}
+                                            <input
+                                                id="X0_Secant"
+                                                type="text"
+                                                name="X0"
+                                                value={this.state.X0}
+                                                onChange={this.handleChange}
+                                            />
+                                            X1:{}
+                                            <input
+                                                id="X1_Secant"
+                                                type="text"
+                                                name="X1"
+                                                value={this.state.X1}
+                                                onChange={this.handleChange}
+                                            />
+                                            <h3>
+                                                <br/>
+                                                Your Equation :
+                                                {this.Convert_Latex(
+                                                    this.state.equation
+                                                )}{" "}
+                                                <br/>
+                                                Inital X0 :{" "}
+                                                {this.Convert_Latex(this.state.X0)}
+                                                <br/>
+                                                Inital X1 :{" "}
+                                                {this.Convert_Latex(this.state.X1)}
+                                            </h3>
+                                            <br/>
+                                                <input className="button" type="submit" value="Submit" />
+                                            <hr/> 
+                                        <h3>Answer : {this.state.Actual_Answer}</h3>
+                                        </MathJax>
+                                    </MathJaxContext>
+                                {this.Create_Graph()}
+                                </label>
+                            </form>
+                        </div>
                     );
-                }
-                return (
-                    <div>
-                        <h1>Multiple Linear Regression</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter4(Data)}
-                    </div>
-                );    
-            
-            case "Single_Trapezoidal_Rule":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Single_Trapezoidal_Rule.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Single_Trapezoidal_Rule[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.Upper, GetData.Lower]}
-                        >
-                            {GetData.id}
-                        </option>
+    
+                case "Cramer_Rule":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Cramer_Rule.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Cramer_Rule[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.metrixA, GetData.metrixB]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>Cramer's Rule</h2>
+                                    <br/>
+                                </MathJax>                    
+                            </MathJaxContext>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            <br/>
+                            {this.ShowInputChapter2(Data)}
+                        </div>
                     );
-                }
-                return (
-                    <div>
-                        <h1>Single Trapezoidal Rule</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter5(Data)}
-                    </div>
-                );     
-
-            case "Composite_Trapezoidal_Rule":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Composite_Trapezoidal_Rule.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Composite_Trapezoidal_Rule[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.Upper, GetData.Lower, GetData.Scope]}
-                        >
-                            {GetData.id}
-                        </option>
+    
+                case "Gauss_Elimination":
+                    for (
+                        let i = 0;
+                        i <
+                        parseInt(
+                            this.state.DataFromAPI[0].Gauss_Elimination.length
+                        );
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Gauss_Elimination[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.metrixA, GetData.metrixB]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>Gauss Elimination Method</h2>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <label>
+                            Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            <br/>
+                            {this.ShowInputChapter2(Data)}
+                        </div>
                     );
-                }
-                return (
-                    <div>
-                        <h1>Composite Trapezoidal Rule</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter5(Data)}
-                    </div>
-                );  
-
-            case "Simpson_Rule":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Simpson_Rule.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Simpson_Rule[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.Upper, GetData.Lower]}
-                        >
-                            {GetData.id}
-                        </option>
+    
+                case "Gauss_Jordan":                
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Gauss_Jordan.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Gauss_Jordan[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.metrixA, GetData.metrixB]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }          
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>Gauss Jordan</h2>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            <br/>
+                            {this.ShowInputChapter2(Data)}
+                        </div>
                     );
-                }
-                return (
-                    <div>
-                        <h1>Simpson's Rule</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter5(Data)}
-                    </div>
-                );  
-
-            case "Composite_Simpson_Rule":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Composite_Simpson_Rule.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Composite_Simpson_Rule[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.Upper, GetData.Lower, GetData.Scope]}
-                        >
-                            {GetData.id}
-                        </option>
+    
+                case "LU_Decompost":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].LU_Decompost.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].LU_Decompost[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.metrixA, GetData.metrixB]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>LU Decompost</h2>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            <br/>
+                            {this.ShowInputChapter2(Data)}
+                        </div>
                     );
-                }
-                return (
-                    <div>
-                        <h1>Composite Simpson's Rule</h1>
-                        <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
-                        </label>
-                        <br />
-                        {this.ShowInputChapter5(Data)}
-                    </div>
-                );  
-                      
-            case "Numerical_Differentiation":
-                for (
-                    let i = 0;
-                    i < parseInt(this.state.DataFromAPI[0].Numerical_Differentiation.length);
-                    i++
-                ) {
-                    GetData = this.state.DataFromAPI[0].Numerical_Differentiation[i];
-                    Data.push(
-                        <option
-                            key={GetData.id}
-                            value={[GetData.equation, GetData.X, GetData.h]}
-                        >
-                            {GetData.id}
-                        </option>
+    
+                case "Jacobi_Iteration":
+                    for (
+                        let i = 0;
+                        i <
+                        parseInt(this.state.DataFromAPI[0].Jacobi_Iteration.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Jacobi_Iteration[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[
+                                    GetData.metrixA,
+                                    GetData.metrixB,
+                                    GetData.metrixX
+                                ]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>Jacobi Iteration</h2>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            <br/>
+                            {this.ShowInputChapter2(Data)}
+                        </div>
                     );
-                }
-                return (
-                    <div>
-                        <h1>Numerical Differentiation</h1>
+    
+                case "Gauss_Seidel_Iteration":
+                    for (
+                        let i = 0;
+                        i <
+                        parseInt(
+                            this.state.DataFromAPI[0].Gauss_Seidel_Iteration.length
+                        );
+                        i++
+                    ) {
+                        GetData =
+                            this.state.DataFromAPI[0].Gauss_Seidel_Iteration[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[
+                                    GetData.metrixA,
+                                    GetData.metrixB,
+                                    GetData.metrixX
+                                ]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                             <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>Gauss Seidel Iteration</h2>
+                                    <br/>
+                                </MathJax>                    
+                            </MathJaxContext>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter2(Data)}
+                        </div>
+                    );
+    
+                case "Conjugate_Gradient":
+                    for (
+                        let i = 0;
+                        i <
+                        parseInt(
+                            this.state.DataFromAPI[0].Conjugate_Gradient.length
+                        );
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Conjugate_Gradient[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[
+                                    GetData.metrixA,
+                                    GetData.metrixB,
+                                    GetData.metrixX
+                                ]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>Conjugate Gradient</h2>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter2(Data)}
+                        </div>
+                    );
+    
+                case "Newton's_divided-differences":
+                    return (
+                        <div>
+                            <h1>Newton's divided-differences</h1>
+                            <form onSubmit={this.handleSubmit}>
+                                <label>
+                                    X :{""}
+                                    <input
+                                        id="metA_Newtondivided"
+                                        type="text"
+                                        name="metA"
+                                        onChange={this.handleChange}
+                                    />
+                                    Y:{}
+                                    <input
+                                        id="metB_Newtondivided"
+                                        type="text"
+                                        name="metB"
+                                        onChange={this.handleChange}
+                                    />
+                                    Scope:{}
+                                    <input
+                                        id="metX_Newtondivided"
+                                        type="text"
+                                        name="metX"
+                                        onChange={this.handleChange}
+                                    />
+                                    X_:
+                                    {
+                                        <input
+                                            id="X_Newtondivided"
+                                            type="text"
+                                            name="X"
+                                            onChange={this.handleChange}
+                                        />
+                                    }
+                                </label>
+                                <input type="submit" value="Submit" />
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        MatrixA :{" "}
+                                        {this.Convert_Latex(this.state.metA)}
+                                        <br></br>
+                                        MatrixB :{" "}
+                                        {this.Convert_Latex(this.state.metB)}
+                                    </MathJax>
+                                </MathJaxContext>
+                                <h1 id="Newton's divided-differences" />{" "}
+                                {/* <div>{this.Create_Graph()}</div> */}
+                            </form>
+                        </div>
+                    );
+    
+                case "Lagrange_Interpolation":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Lagrange_Interpolation.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Lagrange_Interpolation[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.metrixX, GetData.metrixY, GetData.Scope, GetData.X]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h3>Lagrange Interpolation</h3>
+                                </MathJax>
+                            </MathJaxContext>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter3(Data)}
+                        </div>
+                    );
+                
+                case "Linear_Regression":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Linear_Regression.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Linear_Regression[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.metrixX, GetData.metrixY, GetData.X]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <h1>Linear Regression</h1>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter4(Data)}
+                        </div>
+                    );
+    
+                case "Polynomial_Regression":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Polynomial_Regression.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Polynomial_Regression[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.metrixX, GetData.metrixY, GetData.X]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <h1>Polynomial Regression</h1>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter4(Data)}
+                        </div>
+                    );
+                
+                case "Multiple_Linear_Regression":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Multiple_Linear_Regression.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Multiple_Linear_Regression[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.metrix1, GetData.metrix2, GetData.metrix3, 
+                                        GetData.metrixY, GetData.X1, GetData.X2, GetData.X3]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <h1>Multiple Linear Regression</h1>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter4(Data)}
+                        </div>
+                    );    
+                
+                case "Single_Trapezoidal_Rule":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Single_Trapezoidal_Rule.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Single_Trapezoidal_Rule[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.Upper, GetData.Lower]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <h1>Single Trapezoidal Rule</h1>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter5(Data)}
+                        </div>
+                    );     
+    
+                case "Composite_Trapezoidal_Rule":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Composite_Trapezoidal_Rule.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Composite_Trapezoidal_Rule[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.Upper, GetData.Lower, GetData.Scope]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <h1>Composite Trapezoidal Rule</h1>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter5(Data)}
+                        </div>
+                    );  
+    
+                case "Simpson_Rule":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Simpson_Rule.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Simpson_Rule[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.Upper, GetData.Lower]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <h1>Simpson's Rule</h1>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter5(Data)}
+                        </div>
+                    );  
+    
+                case "Composite_Simpson_Rule":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Composite_Simpson_Rule.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Composite_Simpson_Rule[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.Upper, GetData.Lower, GetData.Scope]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <h1>Composite Simpson's Rule</h1>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter5(Data)}
+                        </div>
+                    );  
+                          
+                case "Numerical_Differentiation":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Numerical_Differentiation.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Numerical_Differentiation[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.equation, GetData.X, GetData.h]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <h1>Numerical Differentiation</h1>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br />
+                            {this.ShowInputChapter5(Data)}
+                        </div>
+                    );     
+    
+                default:
+                    return (
                         <label>
-                            <input
-                                type="checkbox"
-                                onChange={this.toggleSwitch}
-                                name="ManualInput"
-                                value={this.state.ManualInput}
-                            />
+                            <h2>Welcome To Website Numerical Method Calculator</h2>
+                            <hr/>
+                            <div>Authorize By Cheewathep Testongla</div>
                         </label>
-                        <br />
-                        {this.ShowInputChapter5(Data)}
-                    </div>
-                );     
-
-            default:
-                return <div>Blank</div>;
+                    );
+            }
+        }
+        else 
+        {
+            this.DisplayPleaseLogin = [<h2>Please Log in To used website</h2>]
         }
     };
         
@@ -4276,28 +4555,32 @@ class Home extends React.Component {
     CheckLogin = (hash, Hash) => {
         if(hash === Hash)
         {
+            this.DisplayPleaseLogin = "";
             console.log("Match");
-            this.setState({
-                HTML: (<button onClick={this.Logout}>Logout</button>),
-                HaveToken: true,
-                Account: (<h4 className="login">{this.state.UserName} is currently Login!!!</h4>)
-            })
+                this.setState({
+                    GetDataFirstTime: false,
+                    HTML: (<button onClick={this.Logout}>Logout</button>),
+                    HaveToken: true,
+                    Account: (<h3 className="login">{this.state.UserName}</h3>)
+                });
         }
         else 
         {
             console.log("Not Match");    
-            alert('Please Log in Again!!!');
+            alert('Please Log in Again');
             this.setState({
                 HTML: (<form className='login' onSubmit={this.GetToken}>
                             <div>Username</div>
                             <input className="Input-Login" id="UserName" type="text" name="UserName" onChange={this.handleChange}></input>
                             <div>Password</div>
-                            <input className="Input-Login" id="Password" type="text" name="Password" onChange={this.handleChange}></input>
+                            <input className="Input-Login" id="Password" type="password" name="Password" onChange={this.handleChange}></input>
                             <br></br>
                             <input type="submit" value="Submit"/>
                         </form>),
                 HaveToken: false,
-                Account: (<h4 className="text">Guest User</h4>)
+                GetDataFirstTime: true,
+                DataFromAPI : [],
+                Account: (<h3 className="text">Guest User</h3>)
             })
         }
     } 
@@ -4306,19 +4589,19 @@ class Home extends React.Component {
     GetToken = (event) => {
         this.setState({
             HTML: []
-        })
-        event.preventDefault();
-        var Token = "$2a$04$eBZPddZ99411Y7ahj5sQYe"
+        });
+        var Token = "$2a$04$eBZPddZ99411Y7ahj5sQYe";
         var GenHash = bcrypt.hash(this.state.UserName+this.state.Password, Token, (err, hash) => {
             fetch('http://localhost:3001/User')
             .then((resp) => (resp).json())
             .then((GetAccount) => {
-                var EncryptData = bcrypt.hash(GetAccount.email+GetAccount.password, Token, (err, Hash) => {
+                var EncryptData = bcrypt.hash(GetAccount[0].email+GetAccount[0].password, Token, (err, Hash) => {
                     // Called Function CheckLogin to Check if encrypt Data & encrypt real Data is match
                     this.CheckLogin(hash, Hash);
                 });
             })
         });  
+        event.preventDefault();
     }
 
     Logout = () => {
@@ -4329,7 +4612,7 @@ class Home extends React.Component {
                         <div>Username</div>
                         <input className="Input-Login" id="UserName" type="text" name="UserName" onChange={this.handleChange}></input>
                         <div>Password</div>
-                        <input className="Input-Login" id="Password" type="text" name="Password" onChange={this.handleChange}></input>
+                        <input className="Input-Login" id="Password" type="password" name="Password" onChange={this.handleChange}></input>
                         <br></br>
                         <input type="submit" value="Submit"/>
                         </form>
@@ -4337,28 +4620,26 @@ class Home extends React.Component {
                 HaveToken: false,
                 UserName: '',
                 Password: '',
-                Account: (<h4 className="login">Guest User</h4>)
+                DataFromAPI: [],
+                GetDataFirstTime: true,
+                Account: (<h3 className="login">Guest User</h3>)
             })
         }
     }
 
     //*** Generate Components ***//
     render = () => {
-        // Get Data from JSON Server
+        // Get Data from JSON Server        
         if (this.state.GetDataFirstTime === true) {
             let text = "http://localhost:3001/Numerical_Method";
             fetch(text)
                 .then((resp) => resp.json())
                 .then((data) => {
                     this.setState({
-                        DataFromAPI: data,
-                    });
-                });
-            this.setState({
-                GetDataFirstTime: false,
+                        DataFromAPI : data
+                    })
             });
         }
-
         return (
             <>
                 <div className="Super-Background">
@@ -4614,10 +4895,12 @@ class Home extends React.Component {
                     </nav>
                     {this.state.Account}
                     {this.state.HTML}
-                    <div>
+                    <div className="Panel">
                         {this.Input()}
+                        <br/>
+                        <br/>
+                        {this.DisplayPleaseLogin}
                     </div>
-                    <h1>aaaa</h1>
                 </div>
             </>
         );
