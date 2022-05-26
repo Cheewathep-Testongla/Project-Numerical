@@ -9,8 +9,10 @@
     "better-react-mathjax": "^2.0.0",
     "bootstrap": "^5.1.3",
     "crypto-js": "^4.1.1",
+    "cubic-spline": "^3.0.3",
     "desmos": "^1.5.4",
     "file-system": "^1.2.2",
+    "jest-environment-jsdom-sixteen": "^2.0.0",
     "jquery": "^3.6.0",
     "json-server-auth": "^2.1.0",
     "mathjax": "^3.2.0",
@@ -31,7 +33,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --env=jest-environment-jsdom-sixteen",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -54,6 +56,7 @@
   },
   "devDependencies": {
     "@testing-library/dom": "^8.13.0",
-    "@testing-library/user-event": "^14.2.0"
+    "@testing-library/user-event": "^14.2.0",
+    "jest-environment-jsdom-sixteen": "^1.0.3"
   }
 }

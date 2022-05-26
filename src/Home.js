@@ -3,7 +3,6 @@ import "bootstrap/dist/js/bootstrap.min.js";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./CSS/Panel.css"
 import * as Math from "mathjs";
-import bcrypt from 'bcryptjs'
 import {
     LineChart,
     Line,
@@ -15,15 +14,17 @@ import {
 } from "recharts";
 
 import { MathJax, MathJaxContext } from "better-react-mathjax";
+import {Spline} from "cubic-spline";
 
 class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             //Token
-            Account: (<h4 className="text" data-testid="Guest User" value="Guest User">Guest User</h4>),
-            // PostData: [<button onChange={this.UploadData}>Upload Equation</button>],
-            HTML:   (<form className="Login" name="Login" onSubmit={this.GetToken}>
+            Account: (<h4 id="Guest User" className="text" data-testid="Guest User" value="Guest User">Guest User</h4>),
+            UserName: '',
+            Password: '',
+            HTML:   (<form className="Login" name="Login" data-testid="Submit_Login" onSubmit={this.Login}>
                         <div>Username</div>
                         <input className="Input-Login" id="UserName" type="text" data-testid="UserName" name="UserName" onChange={this.handleChange}></input>
                         <div>Password</div>
@@ -32,9 +33,7 @@ class Home extends React.Component {
                         <input type="submit" value="Submit"/>
                     </form>
                     ),
-            HaveToken: false,
-            UserName: '',
-            Password: '',
+            Token: '',
             //Manual Input
             ManualInput: false,
             // API
@@ -65,7 +64,7 @@ class Home extends React.Component {
             // Used metX from Chapter 2
             metY: [],
             Size: 0,
-            Scope: 0,
+            Scope: [],
             // Chapter 4
             // Used X1 from Chapter 1 AND metX from Chapter 2 AND metY, Size from Chapter 3
             met1: [],
@@ -181,7 +180,7 @@ class Home extends React.Component {
     GetDataFromManualInput = () => {
         this.CheckEveryInput = true;
         if (this.GetInputMatrix === true) {
-            if(this.state.Chapter === "Lagrange_Interpolation")
+            if(this.state.Chapter === "Lagrange_Interpolation" || this.state.Chapter === "Spline")
             {
                 // Get Data from Input Table
                 var TempMatrixX = [];
@@ -236,7 +235,6 @@ class Home extends React.Component {
                 try {
                     for (let i = 0; i < this.state.row; i++) {
                         for (let j = 0; j < this.state.column; j++) {
-                            console.log(document.getElementById("B"+j.toString()).value);
                             if (
                                 document.getElementById(i.toString() + j.toString())
                                     .value === "" ||
@@ -516,13 +514,13 @@ class Home extends React.Component {
                     break;
     
                 case "Gauss_Jordan":
-                    // this.GetDataFromManualInput();
+                    this.GetDataFromManualInput();
                     break;
     
                 case "LU_Decompost":
-                    // this.GetDataFromManualInput();
+                    this.GetDataFromManualInput();
                     break;
-    
+
                 case "Jacobi_Iteration":
                     this.GetDataFromManualInput();
                     break;
@@ -542,7 +540,11 @@ class Home extends React.Component {
                 case "Lagrange_Interpolation":
                     this.GetDataFromManualInput();
                     break;
-    
+
+                case "Spline":
+                    this.GetDataFromManualInput();
+                    break;
+
                 case "Linear_Regression":
                     this.GetDataFromManualInput();
                     break;
@@ -556,19 +558,47 @@ class Home extends React.Component {
                     break;
                 
                 case "Single_Trapezoidal_Rule":
-                    this.Calculation();
+                    if(this.state.equation === "" && (this.state.Upper < this.state.Lower))
+                    {
+                        alert("Please Enter every input!!!");
+                    }
+                    else
+                    {
+                        this.Calculation();
+                    }
                     break;  
 
                 case "Composite_Trapezoidal_Rule":
-                    this.Calculation();
+                    if(this.state.equation === "" && (this.state.Upper < this.state.Lower) && (this.state.Scope === []))
+                    {
+                        alert("Please Enter every input!!!");
+                    }
+                    else
+                    {
+                        this.Calculation();
+                    }
                     break;   
 
                 case "Simpson_Rule":
-                    this.Calculation();
+                    if(this.state.equation === "" && (this.state.Upper < this.state.Lower))
+                    {
+                        alert("Please Enter every input!!!");
+                    }
+                    else
+                    {
+                        this.Calculation();
+                    }
                     break;   
 
                 case "Composite_Simpson_Rule":
-                    this.Calculation();
+                    if(this.state.equation === "" && (this.state.Upper < this.state.Lower) && (this.state.Scope === []))
+                    {
+                        alert("Please Enter every input!!!");
+                    }
+                    else
+                    {
+                        this.Calculation();
+                    }
                     break; 
                           
                 case "Numerical_Differentiation":
@@ -595,7 +625,6 @@ class Home extends React.Component {
     };
 
     CheckChapter = (event) => {
-        console.log(event.target.id)
         switch (event.target.id) {
             case "Bisection":
                 this.setState({
@@ -769,7 +798,19 @@ class Home extends React.Component {
                     ProveAnswer: []
                 });
                 break;
-
+            
+            case "Spline":
+                this.setState({
+                    Chapter: "Spline",
+                    metX: [],
+                    metY: [],
+                    X: 0,
+                    Actual_Answer: 0,
+                    Matrix_Answer: [],
+                    ProveAnswer: []
+                });
+                break;
+    
             case "Linear_Regression":
                 this.setState({
                     Chapter: "Linear_Regression",
@@ -874,6 +915,7 @@ class Home extends React.Component {
                     ModeForDiff: "",
                     FormulaForDiff: "",
                     ExactAnswer: 0,
+                    Actual_Answer: 0,
                     Error: 0
                 })
                 break;
@@ -974,6 +1016,8 @@ class Home extends React.Component {
         var count = 0;
         var Final_Answer = [];
         var Prove_Answer = "";
+        var Actual_Answer = 0;
+        var ExactAnswer = 0;
         this.Answer = 0;
 
         // var Answer_Show_Table = [];
@@ -1358,50 +1402,92 @@ class Home extends React.Component {
                 {
                     A = JSON.parse(this.state.metA);
                     B = JSON.parse(this.state.metB);
-    
                     //Initial length of For
                     size = A.length;
-    
-                    // Called function Forward Elimination
-                    [A, B] = this.ForwardElimination(A, B, size);
-    
-                    // console.log(A, B);
-                    var Final_AnswerA = A;
-                    var Final_AnswerB = B;
-    
-                    // console.log(this.state.D);
-                    multiplier_1 = [];
-                    multiplier_2 = [];
-    
-                    var a = A;
-                    var b = B;
-                    index = size - 1;
-    
-                    //Further Reduction
-                    // for (let i = size - 1; i >= 0; i--) {
-                    //     round = B[i];
-                    //     var tb = 0;
-                    //     for (let j = size - 1; j >= 0; j--) {
-                    //         if (i === j) {
-                    //             // Final_AnswerA[index][j] = A[i][j] / A[i][j];
-                    //             Final_AnswerB[index] = B[j] / A[i][j];
-    
-                    //             // a[i-1][j] = a[i][j]*a[i-1][j];
-                    //             b[index] = b[i]*a[i-1][j];
-                    //             tb = b;
-                    //         }
-                    //         else{
-                    //             // Final_AnswerA[index][j] = Final_AnswerA[i][j] - a[i][j];
-                    //             Final_AnswerB[i] = Final_AnswerB[index] - tb[j];
-                    //             // console.log(Final_AnswerB);
-                    //             // console.log(Final_AnswerA);
-                    //         }
-    
-                    //         console.log(Final_AnswerB);
-                    //         // console.log(A);
-                    //     }
-                    //     index--;
-                    // }
+                    for(let i = 0; i < size; i++)
+                    {
+                        for(let j = 0; j < i; j++)
+                        {
+                            var temp = A[i][j];
+                            for(let k = 0; k < A[i].length; k++)
+                            {
+                                if((temp * Math.abs(A[j][j]) > 0 && A[j][j] * Math.abs(temp) > 0) || 
+                                    (temp * Math.abs(A[j][j]) < 0 && A[j][j] * Math.abs(temp) < 0))
+                                {
+                                    A[i][k] = (A[i][k] * Math.abs(A[j][j])) - (A[j][k] * Math.abs(temp));
+                                    if(k === A[i].length - 1)
+                                    {
+                                        B[i] = B[i] * Math.abs(A[j][j]) - (B[j] * Math.abs(temp));
+                                    }
+                                }
+                                else
+                                {
+                                    A[i][k] = (A[i][k] * Math.abs(A[j][j])) + (A[j][k] * Math.abs(temp));
+                                    if(k === A[i].length - 1)
+                                    {
+                                        B[i] = B[i] * Math.abs(A[j][j]) + (B[j] * Math.abs(temp));
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    for(let i = size-1; i >= 0; i--)
+                    {
+                        for(let j = size-1 ; j > i; j--)
+                        {
+                            var temp = A[i][j];
+                            for(let k = 0; k < A[i].length; k++)
+                            {
+                                if( (temp * Math.abs(A[j][j]) > 0 && A[j][j] * Math.abs(temp) > 0) || 
+                                    (temp * Math.abs(A[j][j]) < 0 && A[j][j] * Math.abs(temp) < 0))
+                                {
+                                    A[i][k] = (A[i][k] * Math.abs(A[j][j])) - (A[j][k] * Math.abs(temp))
+                                    if(k === A[i].length-1)
+                                    {
+                                        B[i] = B[i] * Math.abs(A[j][j]) - (B[j] * Math.abs(temp))
+                                    }
+                                }
+                                else
+                                {
+                                    A[i][k] = (A[i][k] * Math.abs(A[j][j])) + (A[j][k] * Math.abs(temp))
+                                    if(k === A[i].length-1)
+                                    {
+                                        B[i] = B[i] * Math.abs(A[j][j]) + (B[j] * Math.abs(temp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    for(let i = size-1; i >= 0; i--)
+                    {
+                        let temp = 0;
+                        for(let j = 0; j < A[i].length; j++)
+                        {
+                            if(j!==i)
+                            {
+                                temp += A[i][j] * B[j];
+                            }
+                        }
+                        if(temp > 0)
+                        {
+                            Final_Answer.push(
+                                <p id={i} value={ (B[i] - Math.abs(temp))/A[i][i]}>
+                                    X{i} : {(B[i] - Math.abs(temp))/A[i][i]}
+                                </p>
+                            );
+                        }
+                        else{
+                            Final_Answer.push(
+                                <p id={i} value={ (B[i] + Math.abs(temp))/A[i][i]}>
+                                    X{i} : {(B[i] + Math.abs(temp))/A[i][i]}
+                                </p>
+                            );
+                        }
+                    }
+                    this.setState({
+                        Matrix_Answer: Final_Answer,
+                    });
                 }
                 catch(e) {};
                 break;
@@ -1409,7 +1495,74 @@ class Home extends React.Component {
             case "LU_Decompost":
                 try
                 {
+                    var A = JSON.parse(this.state.metA);
+                    var B = JSON.parse(this.state.metB);
 
+                    var Lower = Array(A.length).fill(0).map(x=>Array(A[0].length).fill(0));
+                    console.log(Lower);
+                    var Upper = Array(A.length).fill(0).map(x=>Array(A[0].length).fill(0));
+                    console.log(Upper);
+                    var Y = Array(A.length).fill(0);
+                    var X = Array(A.length).fill(0);
+                    for(let i = 0; i < A.length; i++)
+                    {
+                        for(let j = i; j < A[0].length; j++)
+                        {
+                            var sum = 0;
+                            for(let k = 0; k < i; k++)
+                            {
+                                sum += (Lower[i][k]*Upper[k][j]);
+                            }
+                            Upper[i][j] = A[i][j] - sum;
+                        }
+                        for(let j = i; j < A[0].length; j++)
+                        {
+                            if(i === j)
+                            {
+                                Lower[i][i] = 1;
+                            }
+                            else
+                            {
+                                var sum = 0;
+                                for(let k = 0; k < i; k++)
+                                {
+                                    sum += (Lower[j][k]*Upper[k][i]);
+                                }
+                                Lower[j][i] = (A[j][i] - sum )/Upper[i][i];
+                            }
+                        }
+                    }
+                    for(let i = 0; i < A.length; i++)
+                    {
+                        var sum = 0;
+                        for(let j = 0; j < A[0].length; j++)
+                        {
+                            if(j !== i)
+                            {
+                                sum += Lower[i][j]*Y[j];
+                            }
+                        }
+                        Y[i]=(B[i] - sum)/Lower[i][i];
+                    }
+                    for(let i = A.length-1; i >= 0; i--)
+                    {
+                        var sum = 0;
+                        for(let j = 0; j < A[0].length; j++)
+                        {
+                            if(j !== i)
+                            {
+                                sum += Upper[i][j] * X[j];
+                            }
+                        }
+                        Final_Answer.push(
+                            <h1>
+                                X{i} : {parseFloat(((Y[i]-sum)/Upper[i][i]).toPrecision(15))}
+                            </h1>
+                        );
+                    }
+                    this.setState({
+                        Matrix_Answer: Final_Answer
+                    })
                 }
                 catch(e) {};
                 break;
@@ -1651,7 +1804,22 @@ class Home extends React.Component {
                 }
                 catch {}
                 break;
-            
+       
+            case "Spline" :
+                try{
+                    var metX = JSON.parse(this.state.metX);
+                    var metY = JSON.parse(this.state.metY);
+                    var X = JSON.parse(this.state.X);
+                    const Spline = require('cubic-spline');
+                    const spline = new Spline(metX, metY);
+                    this.setState({
+                        Actual_Answer: spline.at(X)
+                    })
+                    console.log(spline.at(X)); 
+                }
+                catch(e) {};
+                break;
+
             case "Linear_Regression":
                 // Store a
                 try{
@@ -1780,7 +1948,7 @@ class Home extends React.Component {
                 break;
 
             case "Multiple_Linear_Regression":
-                // try{
+                try{
                     Final_Answer = [];
                     // For Replace a with Final_Answer
                     Prove_Answer = "";
@@ -1864,27 +2032,139 @@ class Home extends React.Component {
                             ),
                         Matrix_Answer: Final_Answer
                     })
-                // }
-                // catch {}
+                }
+                catch {}
                 break;
             
             case "Single_Trapezoidal_Rule":
+                var XLower = this.Convert_Eq(this.state.equation, this.state.Lower);
+                var XUpper = this.Convert_Eq(this.state.equation, this.state.Upper);
+
+                Actual_Answer = ((this.state.Upper-this.state.Lower)/2)*(XLower+XUpper);
+
+                this.setState({
+                    Actual_Answer: Actual_Answer
+                })
                 break;
 
             case "Composite_Trapezoidal_Rule":
+                try 
+                {
+                    var Scope = JSON.parse(this.state.Scope);
+                    var fx = [];
+                    var j = 0;
+                    var h = 0;
+                    var count = JSON.parse(this.state.Lower);
+
+                    for(let i = 0; i < Scope.length; i++)
+                    {
+                        j = 0;
+                        h = (this.state.Upper - this.state.Lower)/Scope[i];
+                        count = JSON.parse(this.state.Lower);
+                        while(count <= this.state.Upper)
+                        {
+                            fx[j] = this.Convert_Eq(this.state.equation, count);
+                            count += h;
+                            j++;
+                        }
+                        var SumMidValue = 0;
+                        for(let k = 1; k < j-1; k++)
+                        {
+                            SumMidValue += fx[k];
+                        }     
+                        console.log(fx);
+                        console.log(SumMidValue);
+                        Final_Answer.push(
+                            <p id={Scope[i]} value={((h/2)*(fx[0]+fx[j-1]+2*(SumMidValue)))}>
+                                Scope = {Scope[i]} : {((h/2)*(fx[0]+fx[j-1]+2*(SumMidValue)))}
+                            </p>
+                        );
+                    }
+                    this.setState({
+                        Matrix_Answer: Final_Answer
+                    });
+                }
+                catch(e) {}
                 break;
 
             case "Simpson_Rule":
+                try 
+                {
+                    var fx = [];
+                    var j = 0;
+                    var h = h = (this.state.Upper - this.state.Lower)/2;
+                    var count = JSON.parse(this.state.Lower);
+          
+                    while(count <= this.state.Upper)
+                    {
+                        fx[j] = this.Convert_Eq(this.state.equation, count);
+                        count += h;
+                        j++;
+                    }
+                    var SumMidValue = 0;
+                    for(let k = 1; k < j-1; k++)
+                    {
+                        SumMidValue += fx[k];
+                    }     
+                    console.log(SumMidValue);
+                    
+                    this.setState({
+                        Actual_Answer: (h/3)*(fx[0]+fx[j-1]+4*(SumMidValue))
+                    });
+                }
+                catch(e) {}
                 break;
 
             case "Composite_Simpson_Rule":
+                try 
+                {
+                    var Scope = JSON.parse(this.state.Scope);
+                    var fx = [];
+                    var j = 0;
+                    var h = 0;
+                    var count = JSON.parse(this.state.Lower);
+
+                    for(let i = 0; i < Scope.length; i++)
+                    {
+                        j = 0;
+                        h = (this.state.Upper - this.state.Lower)/Scope[i];
+                        count = JSON.parse(this.state.Lower);
+                        while(count <= this.state.Upper)
+                        {
+                            fx[j] = this.Convert_Eq(this.state.equation, count);
+                            count += h;
+                            j++;
+                        }
+                        var SumEvenIndex = 0;
+                        var SumOddIndex = 0;
+                        for(let k = 1; k < j-1; k++)
+                        {
+                            if(k % 2 === 0)
+                            {
+                                SumEvenIndex += fx[k];
+                            }
+                            else
+                            {
+                                SumOddIndex += fx[k];
+                            }
+                        }     
+                        Final_Answer.push(
+                            <p id={Scope[i]} value={((h/3)*(fx[0]+fx[j-1]+2*(SumEvenIndex)+4*(SumOddIndex)))}>
+                                Scope = {Scope[i]} : {((h/3)*(fx[0]+fx[j-1]+2*(SumEvenIndex)+4*(SumOddIndex)))}
+                            </p>
+                        );
+                    }
+                    this.setState({
+                        Matrix_Answer: Final_Answer
+                    });
+                }
+                catch(e) {}
                 break;
 
             case "Numerical_Differentiation":
                 var equation = this.state.equation;
                 var h = JSON.parse(this.state.h);
                 var X = JSON.parse(this.state.X);
-                // console.log(h, X);
                 this.Answer = 0;
                 var ExactAnswer = 0;
                 var Error = 0;
@@ -1990,7 +2270,52 @@ class Home extends React.Component {
                             }
                             break;
                     }
-                    break;
+                    if(ExactAnswer === 0 && Error === 0 && this.Answer !== 0)
+                    {
+                        if(this.state.Actual_Answer === 0 && this.state.Error === 0 && this.state.ExactAnswer === 0)
+                        {
+                            alert("Do you want to submit your data?");
+                            this.setState({
+                                Actual_Answer: this.Answer,
+                                Error: 0,
+                                ExactAnswer: 0
+                            });
+                        }
+                        else if(this.state.Actual_Answer !== this.Answer ||
+                                this.state.Error !== Error ||
+                                this.state.ExactAnswer !== ExactAnswer)
+                        {
+                            alert("Do you want to submit your data?");
+                            this.setState({
+                                Actual_Answer: this.Answer,
+                                Error: 0,
+                                ExactAnswer: 0
+                            });
+                        }
+                    }
+                    else
+                    {
+                        if(this.state.Actual_Answer === 0 || this.state.Error === 0 || this.state.ExactAnswer === 0)
+                        {
+                            alert("Do you want to submit your data?");
+                            this.setState({
+                                Actual_Answer: this.Answer,
+                                Error: Error,
+                                ExactAnswer: ExactAnswer
+                            });
+                        }
+                        else if(this.state.Actual_Answer !== this.Answer ||
+                                this.state.Error !== Error ||
+                                this.state.ExactAnswer !== ExactAnswer)
+                        {
+                            alert("Do you want to submit your data?");
+                            this.setState({
+                                Actual_Answer: this.Answer,
+                                Error: Error,
+                                ExactAnswer: ExactAnswer
+                            });
+                        }
+                    }
                 }
                 else 
                 {
@@ -2111,53 +2436,54 @@ class Home extends React.Component {
                             }
                             break;
                     }
+                    if(ExactAnswer === 0 && Error === 0 && this.Answer !== 0)
+                    {
+                        if(this.state.Actual_Answer === 0 && this.state.Error === 0 && this.state.ExactAnswer === 0)
+                        {
+                            alert("Do you want to submit your data?");
+                            this.setState({
+                                Actual_Answer: this.Answer,
+                                Error: 0,
+                                ExactAnswer: 0
+                            });
+                        }
+                        else if(this.state.Actual_Answer !== this.Answer ||
+                                this.state.Error !== Error ||
+                                this.state.ExactAnswer !== ExactAnswer)
+                        {
+                            alert("Do you want to submit your data?");
+                            this.setState({
+                                Actual_Answer: this.Answer,
+                                Error: 0,
+                                ExactAnswer: 0
+                            });
+                        }
+                    }
+                    else
+                    {
+                        if(this.state.Actual_Answer === 0 || this.state.Error === 0 || this.state.ExactAnswer === 0)
+                        {
+                            alert("Do you want to submit your data?");
+                            this.setState({
+                                Actual_Answer: this.Answer,
+                                Error: Error,
+                                ExactAnswer: ExactAnswer
+                            });
+                        }
+                        else if(this.state.Actual_Answer !== this.Answer ||
+                                this.state.Error !== Error ||
+                                this.state.ExactAnswer !== ExactAnswer)
+                        {
+                            alert("Do you want to submit your data?");
+                            this.setState({
+                                Actual_Answer: this.Answer,
+                                Error: Error,
+                                ExactAnswer: ExactAnswer
+                            });
+                        }
+                    }
                 }
-                if(ExactAnswer === 0 && Error === 0 && this.Answer !== 0)
-                {
-                    if(this.state.Actual_Answer === 0 && this.state.Error === 0 && this.state.ExactAnswer === 0)
-                    {
-                        alert("Do you want to submit your data?");
-                        this.setState({
-                            Actual_Answer: this.Answer,
-                            Error: 0,
-                            ExactAnswer: 0
-                        });
-                    }
-                    else if(this.state.Actual_Answer !== this.Answer ||
-                            this.state.Error !== Error ||
-                            this.state.ExactAnswer !== ExactAnswer)
-                    {
-                        alert("Do you want to submit your data?");
-                        this.setState({
-                            Actual_Answer: this.Answer,
-                            Error: 0,
-                            ExactAnswer: 0
-                        });
-                    }
-                }
-                else
-                {
-                    if(this.state.Actual_Answer === 0 && this.state.Error === 0 && this.state.ExactAnswer === 0)
-                    {
-                        alert("Do you want to submit your data?");
-                        this.setState({
-                            Actual_Answer: this.Answer,
-                            Error: Error,
-                            ExactAnswer: ExactAnswer
-                        });
-                    }
-                    else if(this.state.Actual_Answer !== this.Answer ||
-                            this.state.Error !== Error ||
-                            this.state.ExactAnswer !== ExactAnswer)
-                    {
-                        alert("Do you want to submit your data?");
-                        this.setState({
-                            Actual_Answer: this.Answer,
-                            Error: Error,
-                            ExactAnswer: ExactAnswer
-                        });
-                    }
-                }
+               
                 break;
                 
             default:
@@ -2294,6 +2620,18 @@ class Home extends React.Component {
                 });
                 break;
 
+            case "Spline": 
+                splitValue = event.target.value.split("|");
+                splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
+                splitValue[2] = splitValue[2].slice(2, splitValue[2].length);
+                console.log(splitValue[0],splitValue[1],splitValue[2])
+                this.setState({
+                    metX: splitValue[0],
+                    metY: splitValue[1],
+                    X: splitValue[2],
+                });
+                break;
+
             case "Linear_Regression":
                 splitValue = event.target.value.split("|");
                 splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
@@ -2348,11 +2686,10 @@ class Home extends React.Component {
                 splitValue = event.target.value.split("|");
                 splitValue[1] = splitValue[1].slice(2, splitValue[1].length);
                 splitValue[2] = splitValue[2].slice(2, splitValue[2].length);
-                console.log(splitValue[0],splitValue[1],splitValue[2])
                 this.setState({
                     equation: splitValue[0],
-                    Upper: splitValue[1],
-                    Lower: splitValue[2],
+                    Upper: JSON.parse(splitValue[1]),
+                    Lower: JSON.parse(splitValue[2]),
                 });
                 break;
 
@@ -2366,7 +2703,7 @@ class Home extends React.Component {
                     equation: splitValue[0],
                     Upper: splitValue[1],
                     Lower: splitValue[2],
-                    Scope: splitValue[3],
+                    Scope: splitValue[3]
                 });
                 break;
 
@@ -2377,8 +2714,8 @@ class Home extends React.Component {
                 console.log(splitValue[0],splitValue[1],splitValue[2])
                 this.setState({
                     equation: splitValue[0],
-                    Upper: splitValue[1],
-                    Lower: splitValue[2],
+                    Upper: JSON.parse(splitValue[1]),
+                    Lower: JSON.parse(splitValue[2])
                 });
                 break;
             
@@ -2744,7 +3081,7 @@ class Home extends React.Component {
                 for (let i = 0; i < Size; i++) {
                     Matrix_Table.push(
                         <tr>
-                            <input
+                            <input className="input_matrix"
                                 id={"X"+i.toString()}
                             ></input>
                         </tr>
@@ -2765,7 +3102,7 @@ class Home extends React.Component {
                 for (let i = 0; i < Size; i++) {
                     Matrix_Table.push(
                         <tr>
-                            <input
+                            <input className="input_matrix"
                                 id={"Y"+i.toString()}
                             ></input>
                         </tr>
@@ -2776,113 +3113,215 @@ class Home extends React.Component {
         } catch (e) {}
     };
 
-    AddDefaultValueToTable = (met, Size) =>
-    {
+    CheckIfDefaultValueIsNull = (met) => {
         console.log(met);
-        try {
-            if (Size < 2) {
-                this.GetInputMatrix = false;
-            } else if (Size <= 20 && Size > 1 ) {
-                this.GetInputMatrix = true;
-                var Matrix_Table = [];
-                for (let i = 0; i < Size; i++) {
-                    Matrix_Table.push(
-                        <tr>
-                            <input
-                                className="input_matrix"
-                                id={"Y"+i.toString()}
-                                value={met[i]}
-                            ></input>
-                        </tr>
-                    );
-                }
-                return Matrix_Table;
-            }
-        } catch (e) {}
     }
-
     // Manual Input Matric Chapter 3
     ShowInputChapter3 = (Data) => {
         var HTML = [];
-        if (this.state.ManualInput === true) {
-            this.GetInputMatrix = true;
-            HTML.push(
-                <form onSubmit={this.handleSubmit}>
-                    <label>
-                        Size of Data:
-                        <input
-                            id="Size"
-                            type="number"
-                            name="Size"
-                            value={this.state.Size}
-                            onChange={this.handleChange}
-                        ></input>
-                        Scope:
-                        <input
-                            id="Scope"
-                            type="text"
-                            name="Scope"
-                            value={this.state.Scope}
-                            onChange={this.handleChange}
-                        />
-                        X:
-                        <input
-                            id="X"
-                            type="number"
-                            name="X"
-                            value={this.state.X}
-                            onChange={this.handleChange}
-                        />
-                        <br />
-                        Input MatrixX:
-                        <table>
-                            {this.generateMatrixXTable(
-                                this.state.Size
-                            )}
-                        </table>
-                        <br />
-                        Input MatrixY:
-                        <table>
-                            {this.generateMatrixYTable(
-                                this.state.Size
-                            )}
-                        </table>
-                    </label>
-                    <input type="submit" value="Submit" />
-                    Answer : {this.state.Actual_Answer}
-                </form>
-            );
-            return HTML;
-        }
-        if (this.state.ManualInput === false) {
-            HTML = [];
-            this.GetInputMatrix = false;
-            HTML.push(
-                <div>
+        if(this.state.Chapter !== "Spline")
+        {
+            if (this.state.ManualInput === true) {
+
+                this.GetInputMatrix = true;
+                HTML.push(
                     <form onSubmit={this.handleSubmit}>
-                        <select
-                            onChange={this.getEquationFromAPI}
-                            value={[this.state.metX, this.state.metY, this.state.Scope, this.state.X]}
-                        >
-                            <option value="">Choose Example Equation</option>
-                            {Data}
-                        </select>
-                        {/* {this.AddDefaultValueToTable(this.state.metX, JSON.parse(this.state.metX)).length} */}
+                        <label>
+                            Size of Data:
+                            <input
+                                className="input_size"
+                                id="Size"
+                                type="number"
+                                name="Size"
+                                value={this.state.Size}
+                                onChange={this.handleChange}
+                            ></input>
+                            Scope:
+                            <input
+                                className="input_size"
+                                id="Scope"
+                                type="text"
+                                name="Scope"
+                                value={this.state.Scope}
+                                onChange={this.handleChange}
+                            />
+                            X:
+                            <input
+                                className="input_size"
+                                id="X"
+                                type="number"
+                                name="X"
+                                value={this.state.X}
+                                onChange={this.handleChange}
+                            />
+                            <br />
+                            <div className="DisplayFlex">
+                                <div className="matrixA">
+                                    Input MatrixX:
+                                    <table>
+                                        {this.generateMatrixXTable(
+                                            this.state.Size
+                                        )}
+                                    </table>
+                                </div>
+                                <br />
+                                <div className="matrixB">
+                                    Input MatrixY:
+                                    <table>
+                                        {this.generateMatrixYTable(
+                                            this.state.Size
+                                        )}
+                                    </table>
+                                </div>
+                            </div>
+                        </label>
+                        <br/>
                         <br/>
                         <input type="submit" value="Submit" />
+                        <br/>
+                        <hr/>
+                        Answer : {this.state.Actual_Answer}
+                    </form>
+                );
+                return HTML;
+            }
+            if (this.state.ManualInput === false) {
+                HTML = [];
+                this.GetInputMatrix = false;
+                HTML.push(
+                    <div>
+                        <form onSubmit={this.handleSubmit}>
+                            <select
+                                onChange={this.getEquationFromAPI}
+                                value={[this.state.metX, this.state.metY, this.state.Scope, this.state.X]}
+                            >
+                                <option value="">Choose Example Equation</option>
+                                {Data}
+                            </select>
                             <br/>
-                            <hr/>
+                            <br/>
+                            <input type="submit" value="Submit" />
+                                <br/>
+                                <hr/>
+                                <h3>
+                                    <MathJaxContext>
+                                        <MathJax dynamic>
+                                            Answer : {this.state.Actual_Answer}
+                                        </MathJax>
+                                    </MathJaxContext>
+                                </h3>
+                        </form>
+                    </div>
+                );
+                return HTML;
+            }
+        }
+        else
+        {
+            if (this.state.ManualInput === true) {
+
+                this.GetInputMatrix = true;
+                HTML.push(
+                    <form onSubmit={this.handleSubmit}>
+                        <label>
+                            Size of Data:
+                            <input
+                                className="input_size" 
+                                id="Size"
+                                type="number"
+                                name="Size"
+                                value={this.state.Size}
+                                onChange={this.handleChange}
+                            ></input>
+                            X:
+                            <input
+                                className="input_size" 
+                                id="X"
+                                type="number"
+                                name="X"
+                                value={this.state.X}
+                                onChange={this.handleChange}
+                            />
+                            <br />
+                            <div className="DisplayFlex">
+                                <div  className="matrixA">
+                                    Input MatrixX:
+                                    <table>
+                                        {this.generateMatrixXTable(
+                                            this.state.Size
+                                        )}
+                                    </table>
+                                </div>
+                                <div  className="matrixB">
+                                    Input MatrixY:
+                                    <table>
+                                        {this.generateMatrixYTable(
+                                            this.state.Size
+                                        )}
+                                    </table>
+                                </div>
+                            </div>
+                        </label>
+                        <br/>
+                        <br/>
+                        <input type="submit" value="Submit" />
+                        <br/>
+                        <hr/>
+                        <h3>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    Answer : {this.state.Actual_Answer}
+                                </MathJax>
+                            </MathJaxContext>
+                        </h3>
+                    </form>
+                );
+                return HTML;
+            }
+            if (this.state.ManualInput === false) {
+                HTML = [];
+                this.GetInputMatrix = false;
+                HTML.push(
+                    <div>
+                        <form onSubmit={this.handleSubmit}>
+                            <select
+                                onChange={this.getEquationFromAPI}
+                                value={[this.state.metX, this.state.metY, this.state.X]}
+                            >
+                                <option value="">Choose Example Equation</option>
+                                {Data}
+                            </select>
+                            <br/>
                             <h3>
                                 <MathJaxContext>
                                     <MathJax dynamic>
-                                    Answer : {this.state.Actual_Answer}
+                                        <br/>
+                                        X : {this.state.metX}
+                                        <br/>
+                                        Y : {this.state.metY}
+                                        <br/>
+                                        Value X : {this.state.X}
+                                        <br/>
+                                        <br/>
                                     </MathJax>
                                 </MathJaxContext>
                             </h3>
-                    </form>
-                </div>
-            );
-            return HTML;
+                            <input type="submit" value="Submit" />
+                                <br/>
+                                <hr/>
+                                <h3>
+                                    <MathJaxContext>
+                                        <MathJax dynamic>
+                                            Answer : {this.state.Actual_Answer}
+                                        </MathJax>
+                                    </MathJaxContext>
+                                </h3>
+
+                        </form>
+                    </div>
+                );
+                return HTML;
+            }
         }
     };
 
@@ -2899,7 +3338,7 @@ class Home extends React.Component {
                 for (let i = 0; i < Size; i++) {
                     Matrix_Table.push(
                         <tr>
-                            <input
+                            <input className="input_matrix"
                                 id={"X"+n.toString()+i.toString()}
                             ></input>
                         </tr>
@@ -2921,6 +3360,7 @@ class Home extends React.Component {
                         <label>
                             Size of Data:
                             <input
+                                className="input_matrix"
                                 id="Size"
                                 type="number"
                                 name="Size"
@@ -2929,6 +3369,7 @@ class Home extends React.Component {
                             ></input>
                             X:
                             <input
+                                className="input_matrix"
                                 id="X"
                                 type="number"
                                 name="X"
@@ -2936,22 +3377,29 @@ class Home extends React.Component {
                                 onChange={this.handleChange}
                             />
                             <br />
-                            Input MatrixX:
-                            <table>
-                                {this.generateMatrixXTable(
-                                    this.state.Size
-                                )}
-                            </table>
-                            <br />
-                            Input MatrixY:
-                            <table>
-                                {this.generateMatrixYTable(
-                                    this.state.Size
-                                )}
-                            </table>
+                            <div className="DisplayFlex">
+                                <div className="matrixA">
+                                    Input MatrixX:
+                                    <table>
+                                        {this.generateMatrixXTable(
+                                            this.state.Size
+                                        )}
+                                    </table>
+                                    </div>
+                                <br />
+                                <div className="matrixB">
+                                    Input MatrixY:
+                                    <table>
+                                        {this.generateMatrixYTable(
+                                            this.state.Size
+                                        )}
+                                    </table>
+                                </div>
+                            </div>
                         </label>
                         <input type="submit" value="Submit" />
                         <br/>
+                        <hr/>
                         Value of a : {this.state.Matrix_Answer}
                         <h4>Answer</h4>
                         {this.state.ProveAnswer}
@@ -2975,6 +3423,7 @@ class Home extends React.Component {
                             </select>
                             <input type="submit" value="Submit" />
                             <br/>
+                            <hr/>
                             Value of a : {this.state.Matrix_Answer}
                             <h4>Answer</h4>
                             {this.state.ProveAnswer}
@@ -2994,6 +3443,7 @@ class Home extends React.Component {
                         <label>
                             Size of Data:
                             <input
+                                className="input_size"
                                 id="Size"
                                 type="number"
                                 name="Size"
@@ -3002,6 +3452,7 @@ class Home extends React.Component {
                             ></input>
                             X1:
                             <input
+                                className="input_size"
                                 id="X1"
                                 type="number"
                                 name="X1"
@@ -3010,6 +3461,7 @@ class Home extends React.Component {
                             />
                             X2:
                             <input
+                                className="input_size"
                                 id="X2"
                                 type="number"
                                 name="X2"
@@ -3018,6 +3470,7 @@ class Home extends React.Component {
                             />
                             X3:
                             <input
+                                className="input_size"
                                 id="X3"
                                 type="number"
                                 name="X3"
@@ -3025,34 +3478,37 @@ class Home extends React.Component {
                                 onChange={this.handleChange}
                             />
                             <br />
-                            Input MatrixX1:
-                            <table>
-                                {this.generateMatrixXnTable(
-                                    this.state.Size,1
-                                )}
-                            </table>
-                            Input MatrixX2:
-                            <table>
-                                {this.generateMatrixXnTable(
-                                    this.state.Size,2
-                                )}
-                            </table>
-                            Input MatrixX3:
-                            <table>
-                                {this.generateMatrixXnTable(
-                                    this.state.Size,3
-                                )}
-                            </table>
-                            <br />
-                            Input MatrixY:
-                            <table>
-                                {this.generateMatrixYTable(
-                                    this.state.Size
-                                )}
-                            </table>
+                            <div className="DisplayFlex">
+                                Input MatrixX1:
+                                <table>
+                                    {this.generateMatrixXnTable(
+                                        this.state.Size,1
+                                    )}
+                                </table>
+                                Input MatrixX2:
+                                <table>
+                                    {this.generateMatrixXnTable(
+                                        this.state.Size,2
+                                    )}
+                                </table>
+                                Input MatrixX3:
+                                <table>
+                                    {this.generateMatrixXnTable(
+                                        this.state.Size,3
+                                    )}
+                                </table>
+                                <br />
+                                Input MatrixY:
+                                <table>
+                                    {this.generateMatrixYTable(
+                                        this.state.Size
+                                    )}
+                                </table>
+                            </div>
                         </label>
                         <input type="submit" value="Submit" />
                         <br/>
+                        <hr/>
                         Value of a : {this.state.Matrix_Answer}
                         <h4>Answer</h4>
                         {this.state.ProveAnswer}
@@ -3135,15 +3591,31 @@ class Home extends React.Component {
                                 value={this.state.Scope}
                                 onChange={this.handleChange}
                             />
-                            <br />
+                            <br/>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <br/>
+                                    Equation : {this.Convert_Latex(this.state.equation)}
+                                    <br/><br/>
+                                    Upper Boundary : {this.state.Upper}
+                                    <br/><br/>
+                                    Lower Boundary : {this.state.Lower}
+                                    <br/><br/>
+                                    Scope : {this.state.Scope}
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                         </label>
+                        <br/><br/><br/>
                         <input type="submit" value="Submit" />
-                        <br/>
-                        Integral From Formula : {this.state.Actual_Answer}
-                        <br/>
-                        Exact Integral : {this.state.ExactAnswer}
-                        <br/>
-                        Error : {this.state.Error}
+                        <br/><hr/><br/>
+                        <h3>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    Answer : {this.state.Matrix_Answer}
+                                </MathJax>
+                            </MathJaxContext>
+                        </h3>
                         <br/>
                     </form>
                 );
@@ -3162,13 +3634,29 @@ class Home extends React.Component {
                                 <option value="">Choose Example Equation</option>
                                 {Data}
                             </select>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <br/>
+                                    Equation : {this.Convert_Latex(this.state.equation)}
+                                    <br/><br/>
+                                    Upper Boundary : {this.state.Upper}
+                                    <br/><br/>
+                                    Lower Boundary : {this.state.Lower}
+                                    <br/><br/>
+                                    Scope : {this.state.Scope}
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <br/><br/>
                             <input type="submit" value="Submit" />
-                            <br/>
-                            Integral From Formula : {this.state.Actual_Answer}
-                            <br/>
-                            Exact Integral : {this.state.ExactAnswer}
-                            <br/>
-                            Error : {this.state.Error}
+                            <br/><hr/><br/>
+                            <h3>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        Answer : {this.state.Matrix_Answer}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h3>
                             <br/>
                         </form>
                     </div>
@@ -3208,15 +3696,30 @@ class Home extends React.Component {
                                 onChange={this.handleChange}
                             />
                             <br />
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <br/>
+                                    Equation : {this.Convert_Latex(this.state.equation)}
+                                    <br/><br/>
+                                    Upper Boundary : {this.state.Upper}
+                                    <br/><br/>
+                                    Lower Boundary : {this.state.Lower}
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
                         </label>
+                        <br/><br/><br/>
                         <input type="submit" value="Submit" />
                         <br/>
-                        Integral From Formula : {this.state.Actual_Answer}
-                        <br/>
-                        Exact Integral : {this.state.ExactAnswer}
-                        <br/>
-                        Error : {this.state.Error}
-                        <br/>
+                            <hr/><br/>
+                            <h3>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        Answer : {this.state.Actual_Answer}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h3>
+                            <br/>
                     </form>
                 );
                 return HTML;
@@ -3234,13 +3737,27 @@ class Home extends React.Component {
                                 <option value="">Choose Example Equation</option>
                                 {Data}
                             </select>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <br/>
+                                    Equation : {this.Convert_Latex(this.state.equation)}
+                                    <br/><br/>
+                                    Upper Boundary : {this.state.Upper}
+                                    <br/><br/>
+                                    Lower Boundary : {this.state.Lower}
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <br/><br/>
                             <input type="submit" value="Submit" />
-                            <br/>
-                            Integral From Formula : {this.state.Actual_Answer}
-                            <br/>
-                            Exact Integral : {this.state.ExactAnswer}
-                            <br/>
-                            Error : {this.state.Error}
+                            <br/><hr/><br/>
+                            <h3>
+                                <MathJaxContext>
+                                    <MathJax dynamic>
+                                        Answer : {this.state.Actual_Answer}
+                                    </MathJax>
+                                </MathJaxContext>
+                            </h3>
                             <br/>
                         </form>
                     </div>
@@ -3281,7 +3798,7 @@ class Home extends React.Component {
                                             value={this.state.h}
                                             onChange={this.handleChange}
                                         />
-                                    <br/>
+                                    <br/><br/>
                                     Mode:
                                     <select
                                         onChange={this.handleChange}
@@ -3321,32 +3838,25 @@ class Home extends React.Component {
                                                     Second Divided-Differences
                                         </option>
                                     </select>
-                                <br/>
-                                    </label>
+                                    <br/><br/>
                                     <input type="submit" value="Submit" />
-                                    <br/>
-                                    <br/>
+                                    <hr/>
+                                    </label>
+                                    <br/><br/>
                                     Eqution : {this.Convert_Latex(this.state.equation)}
-                                    <br/>
-                                    <br/>
+                                    <br/><br/>
                                     h: {this.Convert_Latex(this.state.h)}
-                                    <br/>
-                                    <br/>
+                                    <br/><br/>
                                     Formula: {this.Convert_Latex(this.state.FormulaForDiff)}
-                                    <br/>
-                                    <br/>
+                                    <br/><br/>
                                     Mode: {this.Convert_Latex(this.state.ModeForDiff)}
-                                    <br/>
-                                    <br/>
+                                    <br/><br/>
                                     Differentiation From Formula : {this.state.Actual_Answer}
-                                    <br/>
-                                    <br/>
+                                    <br/><br/>
                                     Exact Differentiation : {this.state.ExactAnswer}
-                                    <br/>
-                                    <br/>
+                                    <br/><br/>
                                     Error : {this.state.Error}
-                                    <br/>
-                                    <br/>
+                                    <br/><br/>
                                 </MathJax>
                             </MathJaxContext>
                     </form>
@@ -3368,6 +3878,7 @@ class Home extends React.Component {
                                     <option value="">Choose Example Equation</option>
                                     {Data}
                                 </select>
+                                <br/>
                                 <br/>
                                 Mode:
                                 <select
@@ -3409,7 +3920,9 @@ class Home extends React.Component {
                                     </option>
                                 </select>
                                 <br/>
+                                <br/>
                                 <input type="submit" value="Submit" />
+                                <hr/>
                                 <br/>
                                 <br/>
 
@@ -3425,7 +3938,7 @@ class Home extends React.Component {
                                 Mode: {this.Convert_Latex(this.state.ModeForDiff)}
                                 <br/>
                                 <br/>
-                                Mode: {this.Convert_Latex(this.state.Order)}
+                                Method: {this.Convert_Latex(this.state.Order)}
                                 <br/>
                                 <br/>
                                 Differentiation From Formula : {this.state.Actual_Answer}
@@ -3451,7 +3964,7 @@ class Home extends React.Component {
         var Data = [];
         var GetData = 0;
         this.Answer = 0;
-        if(this.state.HaveToken === true)
+        if(this.state.GetDataFirstTime === false)
         {
             switch (this.state.Chapter) {
                 case "Bisection":
@@ -3484,6 +3997,7 @@ class Home extends React.Component {
                             </MathJaxContext>
                             <select
                                 onChange={this.getEquationFromAPI}
+                                data-testid="BisectionAPI"
                                 value={[
                                     this.state.equation,
                                     this.state.left,
@@ -3495,7 +4009,7 @@ class Home extends React.Component {
                             </select>
                             <br/>
                             <br/>
-                            <form onSubmit={this.handleSubmit}>
+                            <form onSubmit={this.handleSubmit} data-testid="BisectionSubmit">
                                 <label className="Input-Equation">
                                     <MathJaxContext>
                                         <MathJax dynamic>
@@ -3504,6 +4018,7 @@ class Home extends React.Component {
                                             id="EQ_Bisection"
                                             type="text"
                                             name="equation"
+                                            data-testid="BisectionEquation"
                                             value={this.state.equation}
                                             onChange={this.handleChange}
                                         ></input>
@@ -3513,6 +4028,7 @@ class Home extends React.Component {
                                             id="L_Bisection"
                                             type="text"
                                             name="left"
+                                            data-testid="BisectionLeft"
                                             value={this.state.left}
                                             onChange={this.handleChange}
                                         />
@@ -3522,6 +4038,7 @@ class Home extends React.Component {
                                             id="R_Bisection"
                                             type="text"
                                             name="right"
+                                            data-testid="BisectionRight"
                                             value={this.state.right}
                                             onChange={this.handleChange}
                                         />
@@ -3543,7 +4060,7 @@ class Home extends React.Component {
                                         <br/>
                                             <input className="button" type="submit" value="Submit" />
                                         <hr/>
-                                        <h3>Answer : {this.state.Actual_Answer}</h3>
+                                        <h4>Answer : {this.state.Actual_Answer}</h4>
                                         </MathJax>
                                     </MathJaxContext>
                                     {this.Create_Graph()}
@@ -3931,7 +4448,7 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
                             <br/>
                             {this.ShowInputChapter2(Data)}
                         </div>
@@ -4010,7 +4527,7 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
                             <br/>
                             {this.ShowInputChapter2(Data)}
                         </div>
@@ -4259,7 +4776,8 @@ class Home extends React.Component {
                         <div>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    <h3>Lagrange Interpolation</h3>
+                                    <h2>Lagrange Interpolation</h2>
+                                    <br/>
                                 </MathJax>
                             </MathJaxContext>
                             <label>
@@ -4270,11 +4788,50 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
+                            <br/>
                             {this.ShowInputChapter3(Data)}
                         </div>
                     );
                 
+                case "Spline":
+                    for (
+                        let i = 0;
+                        i < parseInt(this.state.DataFromAPI[0].Spline.length);
+                        i++
+                    ) {
+                        GetData = this.state.DataFromAPI[0].Spline[i];
+                        Data.push(
+                            <option
+                                key={GetData.id}
+                                value={[GetData.metrixX, GetData.metrixY, GetData.X]}
+                            >
+                                {GetData.id}
+                            </option>
+                        );
+                    }
+                    return (
+                        <div>
+                            <MathJaxContext>
+                                <MathJax dynamic>
+                                    <h2>Spline</h2>
+                                    <br/>
+                                </MathJax>
+                            </MathJaxContext>
+                            <label>
+                                Manual Input : <input
+                                    type="checkbox"
+                                    onChange={this.toggleSwitch}
+                                    name="ManualInput"
+                                    value={this.state.ManualInput}
+                                />
+                            </label>
+                            <br/>
+                            <br/>
+                            {this.ShowInputChapter3(Data)}
+                        </div>
+                    );
+
                 case "Linear_Regression":
                     for (
                         let i = 0;
@@ -4295,7 +4852,7 @@ class Home extends React.Component {
                         <div>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    <h3>Linear Regression</h3>
+                                    <h2>Linear Regression</h2>
                                     <br/>
                                 </MathJax>
                             </MathJaxContext>
@@ -4307,7 +4864,8 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
+                            <br/>
                             {this.ShowInputChapter4(Data)}
                         </div>
                     );
@@ -4332,7 +4890,7 @@ class Home extends React.Component {
                         <div>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    <h3>Polynomial Regression</h3>
+                                    <h2>Polynomial Regression</h2>
                                     <br/>
                                 </MathJax>
                             </MathJaxContext>
@@ -4344,7 +4902,8 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
+                            <br/>
                             {this.ShowInputChapter4(Data)}
                         </div>
                     );
@@ -4370,7 +4929,7 @@ class Home extends React.Component {
                         <div>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    <h3>Multiple Linear Regression</h3>
+                                    <h2>Multiple Linear Regression</h2>
                                     <br/>
                                 </MathJax>
                             </MathJaxContext>
@@ -4382,7 +4941,8 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
+                            <br/>
                             {this.ShowInputChapter4(Data)}
                         </div>
                     );    
@@ -4407,7 +4967,7 @@ class Home extends React.Component {
                         <div>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    <h3>Single Trapezoidal Rule</h3>
+                                    <h2>Single Trapezoidal Rule</h2>
                                     <br/>
                                 </MathJax>
                             </MathJaxContext>
@@ -4419,7 +4979,8 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
+                            <br/>
                             {this.ShowInputChapter5(Data)}
                         </div>
                     );     
@@ -4444,7 +5005,7 @@ class Home extends React.Component {
                         <div>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    Composite Trapezoidal Rule
+                                    <h2>Composite Trapezoidal Rule</h2>
                                     <br/>
                                 </MathJax>
                             </MathJaxContext>
@@ -4456,7 +5017,8 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
+                            <br/>
                             {this.ShowInputChapter5(Data)}
                         </div>
                     );  
@@ -4481,7 +5043,7 @@ class Home extends React.Component {
                         <div>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    <h3>Simpson's Rule</h3>
+                                    <h2>Simpson's Rule</h2>
                                     <br/>
                                 </MathJax>
                             </MathJaxContext>
@@ -4493,7 +5055,8 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
+                            <br/>
                             {this.ShowInputChapter5(Data)}
                         </div>
                     );  
@@ -4518,7 +5081,7 @@ class Home extends React.Component {
                         <div>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    <h3>Composite Simpson's Rule</h3>
+                                    <h2>Composite Simpson's Rule</h2>
                                     <br/>
                                 </MathJax>
                             </MathJaxContext>
@@ -4530,7 +5093,8 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
+                            <br/>
                             {this.ShowInputChapter5(Data)}
                         </div>
                     );  
@@ -4555,7 +5119,7 @@ class Home extends React.Component {
                         <div>
                             <MathJaxContext>
                                 <MathJax dynamic>
-                                    <h3>Numerical Differentiation</h3>
+                                    <h2>Numerical Differentiation</h2>
                                     <br/>
                                 </MathJax>
                             </MathJaxContext>
@@ -4567,7 +5131,8 @@ class Home extends React.Component {
                                     value={this.state.ManualInput}
                                 />
                             </label>
-                            <br />
+                            <br/>
+                            <br/>
                             {this.ShowInputChapter5(Data)}
                         </div>
                     );     
@@ -4584,102 +5149,70 @@ class Home extends React.Component {
         }
         else 
         {
-            this.DisplayPleaseLogin = [<h2 data-testid="PleaseLogin" value="PleaseLogin">Please Log in To used website</h2>]
+            return (<h2 data-testid="PleaseLogin" value="PleaseLogin">Please Log in To used website</h2>);
         }
     };
         
     //*** Part Login & Logout & Post Data***//
-
-    // Check if User is Type Data in Login //
-    CheckLogin = (hash, Hash) => {
-        if(hash === Hash)
-        {
-            this.DisplayPleaseLogin = "";
-            console.log("Match");
-                this.setState({
-                    GetDataFirstTime: false,
-                    HTML: (<button data-testid="Logout" value="Logout" onClick={this.Logout}>Logout</button>),
-                    HaveToken: true,
-                    Account: (<h3 value={this.state.UserName} className="login">{this.state.UserName}</h3>)
-                });
-        }
-        else 
-        {
-            console.log("Not Match");    
-            alert('Please Log in Again');
-            this.setState({
-                HTML: (<form className='login' onSubmit={this.GetToken}>
-                            <div>Username</div>
-                            <input className="Input-Login" id="UserName" type="text" name="UserName" onChange={this.handleChange}></input>
-                            <div>Password</div>
-                            <input className="Input-Login" id="Password" type="password" name="Password" onChange={this.handleChange}></input>
-                            <br></br>
-                            <input type="submit" value="Submit"/>
-                        </form>),
-                HaveToken: false,
-                GetDataFirstTime: false,
-                DataFromAPI : [],
-                Account: (<h3 value="Guest User" className="text">Guest User</h3>)
-            })
-        }
-    } 
-
     // Get Data from Input: Username & Password and bcrypt Data
-    GetToken = (event) => {
-        this.setState({
-            HTML: []
-        });
-        var Token = "$2a$04$eBZPddZ99411Y7ahj5sQYe";
-        var GenHash = bcrypt.hash(this.state.UserName+this.state.Password, Token, (err, hash) => {
-            fetch('http://localhost:3001/User')
-            .then((resp) => (resp).json())
-            .then((GetAccount) => {
-                var EncryptData = bcrypt.hash(GetAccount[0].email+GetAccount[0].password, Token, (err, Hash) => {
-                    // Called Function CheckLogin to Check if encrypt Data & encrypt real Data is match
-                    this.CheckLogin(hash, Hash);
-                });
-            })
-        });  
+    Login = async (event) => {
         event.preventDefault();
+        const requestLogin = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: this.state.UserName,
+                                password: this.state.Password })
+        };
+        await fetch('https://numericalbackend.herokuapp.com/login', requestLogin)
+            .then(resp => resp.json())
+            .then(Token => {
+                this.setState({
+                    Token: Token,
+                    HTML: (<button data-testid="Logout" value="Logout" onClick={this.Logout}>Logout</button>),
+                    Account: (<h3 value={this.state.UserName} className="login">{this.state.UserName}</h3>)
+                });         
+            })
+         if (this.state.GetDataFirstTime === true) {
+            // console.log(this.state.Token);
+            const requestData = {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.state.Token.accessToken}`, // notice the Bearer before your token
+                }
+            }
+            await fetch("https://numericalbackend.herokuapp.com/Numerical_Method", requestData)
+                .then((resp) => resp.json())
+                .then((data) => {
+                    this.setState({
+                        DataFromAPI : data,
+                        GetDataFirstTime: false,  
+                        Chapter: ''
+                    })
+            });
+        }
     }
 
     Logout = () => {
-        if(this.state.HaveToken === true)
-        {
-            this.setState({
-                HTML:   (<form onSubmit={this.GetToken}>
+        this.setState({
+             HTML:  (<form className="Login" name="Login" data-testid="Submit_Login" onSubmit={this.Login}>
                         <div>Username</div>
-                        <input className="Input-Login" id="UserName" type="text" name="UserName" onChange={this.handleChange}></input>
+                        <input className="Input-Login" id="UserName" type="text" data-testid="UserName" name="UserName" onChange={this.handleChange}></input>
                         <div>Password</div>
-                        <input className="Input-Login" id="Password" type="password" name="Password" onChange={this.handleChange}></input>
+                        <input className="Input-Login" id="Password" type="password" data-testid="Password" name="Password" onChange={this.handleChange}></input>
                         <br></br>
                         <input type="submit" value="Submit"/>
-                        </form>
-                        ),
-                HaveToken: false,
-                UserName: '',
-                Password: '',
-                DataFromAPI: [],
-                GetDataFirstTime: true,
-                Account: (<h3 value="Guest User" className="login">Guest User</h3>)
-            })
-        }
+                    </form>
+                    ),
+            Token: '',
+            DataFromAPI: [],
+            GetDataFirstTime: true,
+            Account: (<h3 value="Guest User" className="login">Guest User</h3>)
+        })
     }
 
     //*** Generate Components ***//
     render = () => {
         // Get Data from JSON Server        
-        if (this.state.GetDataFirstTime === true) {
-            let text = "http://localhost:3001/Numerical_Method";
-            fetch(text)
-                .then((resp) => resp.json())
-                .then((data) => {
-                    this.setState({
-                        DataFromAPI : data,
-                        GetDataFirstTime: false,
-                    })
-            });
-        }
         return (
             <>
                 <div className="Super-Background">
@@ -4687,16 +5220,18 @@ class Home extends React.Component {
                         <div className="container-fluid">
                             <h5 className="navbar-brand">Numerical Method</h5>
                             <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                            <ul className="navbar-nav me-auto mb-2 mb-lg-0"
+                                >
                                 <li className="nav-item dropdown">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button className="btn btn-secondary dropdown-toggle" data-testid="Root_Of_Equation" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                     Root Of Equation
                                 </button>
-                                <ul data-testid="Root_Of_Equation" value="Root_Of_Equation" className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <ul value="Bisection" className="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li 
                                         id='Bisection'
                                         className="dropdown-item"
                                         name="Bisection"
+                                        data-testid="Bisection"
                                         value="Bisection"
                                         onClick={this.CheckChapter}
                                     >
@@ -4706,6 +5241,7 @@ class Home extends React.Component {
                                         id='False_Position'
                                         className="dropdown-item"
                                         name="False_Position"
+                                        data-testid="False_Position"
                                         value="False_Position"
                                         onClick={this.CheckChapter}
                                     >
@@ -4715,6 +5251,7 @@ class Home extends React.Component {
                                         id='One_Point_Iteration'
                                         className="dropdown-item"
                                         name="One_Point_Iteration"
+                                        data-testid="One_Point_Iteration"
                                         value="One_Point_Iteration"
                                         onClick={this.CheckChapter}
                                     >
@@ -4725,6 +5262,7 @@ class Home extends React.Component {
                                         id='Newton_Raphson'
                                         className="dropdown-item"
                                         name="Newton_Raphson"
+                                        data-testid="Newton_Raphson"
                                         value="Newton_Raphson"
                                         onClick={this.CheckChapter}
                                     >
@@ -4735,6 +5273,7 @@ class Home extends React.Component {
                                         id='Secant_Method'
                                         className="dropdown-item"
                                         name="Secant_Method"
+                                        data-testid="Secant_Method"
                                         value="Secant_Method"
                                         onClick={this.CheckChapter}
                                     >
