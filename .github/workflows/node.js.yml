@@ -51,8 +51,6 @@ jobs:
             tags: ${{ secrets.DOCKER_HUB_USERNAME }}/numerical_react:latest
         - uses: actions/checkout@v2
         
-#         - name: Build
-#           run: yarn run build
           
         - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
           with:
