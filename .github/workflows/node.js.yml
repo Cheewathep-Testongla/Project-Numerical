@@ -123,6 +123,6 @@ jobs:
             - uses: akhileshns/heroku-deploy@v3.12.12 
               with:
                 heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-                heroku_app_name: "frontendnumer6240602616049" 
+                heroku_app_name: "numericalclient" 
                 heroku_email: "nongton2544@gmail.com"
         
