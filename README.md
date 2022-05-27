@@ -2,6 +2,6 @@ Repository นี้เป็นส่วนหนึ่งในรายวิ
 
 API Document : https://numericalbackend.herokuapp.com/api-docs/
 Client : https://numericalfrontend.herokuapp.com/
-  Email : s6204062616049@email.ac.th
-  Password : 555555
+  \nEmail : s6204062616049@email.ac.th
+  \nPassword : 555555
   
