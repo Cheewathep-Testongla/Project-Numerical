@@ -1,0 +1,23 @@
+
+  // ---------------------------------- //
+  // How to get data from JSON //
+  // first Index : size of Chapter
+  // second Index : list of Chapter Name(_Name)
+  // third Index : size of Unit in Chapter Name(_Name)
+  // console.log(Data.Chapter[0][0].name);
+  // console.log(Data.Chapter[4][_Name[4]][0].name);
+  // ---------------------------------- //
+
+  // const Data = new Map(Object.entries(raw.Chapter));
+  // for (const Chapter of Data.values()) {
+  //   const Sub_Chap = new Map(Object.entries(Chapter));
+  //   for (const key of Sub_Chap.values()) {
+  //     const name = new Map(Object.entries(key));
+  //     for (const Name of name.values()) {
+  //       // Create_Block(Name.name, Name.name);
+  //       // console.log(Name.short);
+  //     }
+  //   }
+  // }
+  
+  
