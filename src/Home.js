@@ -1005,6 +1005,14 @@ class Home extends React.Component {
     // Get Final Answer from function Answer //
     Answer = 0;
 
+    // Newton's Divided Differences //
+    proterm = (i, value, x) => {
+        var pro = 1;
+        for (let j = 0; j < i; j++) {
+            pro = pro * (value - x[j]);
+        }
+        return pro;
+    }
     Calculation = () => {
         var total = 10;
         var L = parseFloat(this.state.left);
@@ -1773,8 +1781,6 @@ class Home extends React.Component {
             case "Newton's_divided-differences":
                 var X = JSON.parse(this.state.metX);
 
-                // this.Recursive(X.length - 1, X.length - 2);
-                // console.log(this.Recursive(X.length - 1, X.length - 2));
                 break;
 
             case "Lagrange_Interpolation":
