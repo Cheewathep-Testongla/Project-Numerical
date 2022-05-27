@@ -113,3 +113,16 @@ jobs:
             tags: ${{ secrets.DOCKER_HUB_USERNAME }}/numerical_react:latest
         - uses: actions/checkout@v2
         
+    Deploy_HeeRoku:
+            runs-on: ubuntu-latest
+            strategy:
+              matrix:
+                node-version: [16.x]
+            steps:
+            - uses: actions/checkout@v2
+            - uses: akhileshns/heroku-deploy@v3.12.12 
+              with:
+                heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+                heroku_app_name: "frontendnumer6240602616049" 
+                heroku_email: "nongton2544@gmail.com"
+        
