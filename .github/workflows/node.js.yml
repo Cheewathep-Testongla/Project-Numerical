@@ -64,9 +64,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
     install-and-test:
@@ -85,7 +85,7 @@ jobs:
             node-version: ${{ matrix.node-version }}
 
         - name: Install packages
-          run: yarn install
+          run: yarn install --frozen-lockfile
 
         - name: Test
           run: yarn test
