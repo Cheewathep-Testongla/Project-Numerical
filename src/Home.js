@@ -5491,7 +5491,7 @@ class Home extends React.Component {
                         <br/>
                         {this.DisplayPleaseLogin}
                     </div>
-                    {/* <h1></h1> */}
+                    <h1></h1>
                 </div>
             </>
         );
