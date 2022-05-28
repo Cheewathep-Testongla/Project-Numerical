@@ -6,4 +6,3 @@ Client : https://numericalfrontend.herokuapp.com/
   * Email : s6204062616049@email.ac.th 
   * Password : 555555 
   
-API : https://numericalbackend.herokuapp.com/api-docs/
